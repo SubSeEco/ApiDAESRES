@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using NJsonSchema.Validation;
 using RES.API.BackOffice;
 using DAES.API.BackOffice.Modelos;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.API.Controllers
 {
@@ -37,7 +38,13 @@ namespace App.API.Controllers
                 if (validation.Count != 0) { return BadRequest("json invalido"); }
 
                 MensajeOrganizacionRES registroOrganizacionBO = jsonDocument.Deserialize<MensajeOrganizacionRES>();
-                
+                Organizacion org = new Organizacion
+                {
+                    TipoOrganizacionId = 1,
+                    RubroId = registroOrganizacionBO.ObjetoSocial.Rubro,
+                    v3 = registroOrganizacionBO.v1
+                }
+                _dbContext.SaveChanges(org);
                 return Ok(registroOrganizacionBO.ContactoDeLaCooperativa.EMail);
             }
             catch (Exception e)
