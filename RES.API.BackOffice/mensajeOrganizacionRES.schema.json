@@ -1,0 +1,1148 @@
+{
+    "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "type": "object",
+    "default": false,
+    "title": "Schema constitucion RES",
+    "required": [
+        "objetoSocial",
+        "nombreCooperativa",
+        "direccionDeLaCooperativa",
+        "contactoDeLaCooperativa",
+        "capitalDeLaCooperativa",
+        "duracionDeLaCooperativa",
+        "administracionDeLaCooperativa",
+        "consejoAdministracion",
+        "juntaDeVigilancia",
+        "derechosYObligacionesSocios",
+        "otrosAcuerdos",
+        "cooperadosYAdministradores",
+        "documentos",
+        "datosDelSistema"
+    ],
+    "properties": {
+        "objetoSocial": {
+            "type": "object",
+            "default": false,
+            "title": "Objeto Social de la Cooperativa",
+            "required": [
+                "rubro",
+                "subRubroEspecifico",
+                "actividades"
+            ],
+            "properties": {
+                "rubro": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Rubro de la Cooperativa",
+                    "examples": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6
+                    ]
+                },
+                "subRubroEspecifico": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "SUB-RUBRO ESPECÍFICO",
+                    "examples": [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7
+                    ]
+                },
+                "actividades": {
+                    "type": "array",
+                    "default": false,
+                    "title": "Actividades de la Cooperativa",
+                    "items": {
+                        "type": "integer"
+                    },
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "examples": [
+                        [
+                            1,
+                            2,
+                            3,
+                            181
+                        ],
+                        [ ]
+                    ]
+                }
+            }
+        },
+        "nombreCooperativa": {
+            "type": "object",
+            "default": false,
+            "title": "Nombre de la Cooperativa",
+            "required": [
+                "razonSocial",
+                "nombreFantasiaOSigla"
+            ],
+            "properties": {
+                "razonSocial": {
+                    "type": "string",
+                    "default": false,
+                    "title": "RAZÓN SOCIAL",
+                    "examples": [
+                        "ASOCIACIÓN GREMIAL DE EMPRESARIOS DE BUSES RURALES DE LA PROVINCIA DE CAUTÍN"
+                    ]
+                },
+                "nombreFantasiaOSigla": {
+                    "type": "string",
+                    "default": false,
+                    "title": "NOMBRE DE FANTASÍA O SIGLA",
+                    "examples": [
+                        "AGEBRP"
+                    ]
+                }
+            }
+
+        },
+        "direccionDeLaCooperativa": {
+            "type": "object",
+            "default": false,
+            "title": "Dirección de la Cooperativa",
+            "required": [
+                "calle",
+                "numero",
+                "bloque",
+                "departamento",
+                "villaPoblacion",
+                "region",
+                "comuna",
+                "direccion"
+            ],
+            "properties": {
+                "calle": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Nombre de la calle",
+                    "examples": [
+                        "San Ignacio"
+                    ]
+                },
+                "numero": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Número de calle",
+                    "examples": [
+                        "063",
+                        "13"
+                    ]
+                },
+                "bloque": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Nombre del bloque",
+                    "examples": [
+                        "3",
+                        "A"
+                    ]
+                },
+                "departamento": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Número o codigo del departamente",
+                    "examples": [
+                        "",
+                        "D14",
+                        "314"
+                    ]
+                },
+                "villaPoblacion": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Nombre de la Villa o Población",
+                    "examples": [
+                        "Villa Los Alerces",
+                        "Población Rosita Renard"
+                    ]
+                },
+                "region": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Codigo de la Región",
+                    "examples": [
+                        1,
+                        16
+                    ]
+                },
+                "comuna": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Codigo de la comuna",
+                    "examples": [
+                        1101,
+                        6201
+                    ]
+                },
+                "direccion": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Dirección: Concatenar CALLE+NÚMERO+BLOQUE+DPTO+VILLA POBLACIÓN",
+                    "examples": [
+                        "San Ignacio 063 3 D14 Villa Los Alerces"
+                    ]
+                }
+            }
+        },
+        "contactoDeLaCooperativa": {
+            "type": "object",
+            "default": false,
+            "title": "Contacto de la Cooperativa",
+            "required": [
+                "eMail",
+                "telefono",
+                "paginaWeb"
+            ],
+            "properties": {
+                "eMail": {
+                    "type": "string",
+                    "default": false,
+                    "title": "E-MAIL",
+                    "examples": [
+                        "contacto@cooperativa.cl"
+                    ]
+                },
+                "telefono": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Numero de Teléfono",
+                    "examples": [
+                        "5001001100",
+                        "2123456789"
+                    ]
+                },
+                "paginaWeb": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Página Web",
+                    "examples": [
+                        "cooperativa.cl"
+                    ]
+                }
+            }
+        },
+        "capitalDeLaCooperativa": {
+            "type": "object",
+            "default": false,
+            "title": "CAPITAL DE LA COOPERATIVA",
+            "required": [
+                "montoTotalCapitalInicial",
+                "numeroCuotasParticipacion",
+                "valorCuotasPaticipacion"
+            ],
+            "properties": {
+                "montoTotalCapitalInicial": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Monto Total del Capital Inicial",
+                    "examples": [
+                        1,
+                        1234567
+                    ]
+                },
+                "numeroCuotasParticipacion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Número Cuotas de Participación",
+                    "examples": [
+                        1,
+                        10
+                    ]
+                },
+                "valorCuotasPaticipacion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Valor Cuotas de Paticipación",
+                    "examples": [
+                        1,
+                        1000,
+                        123456
+                    ]
+                }
+            }
+        },
+        "duracionDeLaCooperativa": {
+            "type": "object",
+            "default": false,
+            "title": "Duración de la Cooperativa",
+            "required": [
+                "indefinido",
+                "anhos"
+            ],
+            "properties": {
+                "indefinido": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "codigo del estado indefinido",
+                    "examples": [
+                        1,
+                        2
+                    ]
+                },
+                "anhos": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Años",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                }
+            }
+        },
+        "administracionDeLaCooperativa": {
+            "type": "object",
+            "default": false,
+            "title": "ADMINISTRACIÓN DE LA COOPERATIVA",
+            "required": ["tipoAdministracion"],
+            "properties": {
+                "tipoAdministracion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Tipo de Administración",
+                    "examples": [
+                        1,
+                        2
+                    ]
+                }
+            }
+        },
+        "consejoAdministracion": {
+            "type": "object",
+            "default": false,
+            "title": "CONSEJO ADMINISTRACIÓN",
+            "required": [
+                "numeroMiembros",
+                "plazoDuracion",
+                "derechoReeleccion"
+            ],
+            "properties": {
+                "numeroMiembros": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Número de Miembros",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "plazoDuracion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Plazo de Duración",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "derechoReeleccion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "¿Hay derecho a reelección?",
+                    "enum": [0, 1]
+                }
+            }
+        },
+        "juntaDeVigilancia": {
+            "type": "object",
+            "default": false,
+            "title": "JUNTA DE VIGILANCIA",
+            "required": [
+                "numeroMiembros",
+                "plazoDuracion",
+                "derechoReeleccion"
+            ],
+            "properties": {
+                "numeroMiembros": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Número de miembros",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "plazoDuracion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "Plazo de duración",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "derechoReeleccion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "¿Hay derecho a reelección?",
+                    "enum": [0, 1]
+                }
+            }
+        },
+        "derechosYObligacionesSocios": {
+            "type": "object",
+            "default": false,
+            "title": "DERECHOS Y OBLIGACIONES DE LOS SOCIOS",
+            "required": ["aporteParaIngresoACooperativa"],
+            "properties": {
+                "aporteParaIngresoACooperativa": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Aporte para ingreso a la cooperativa",
+                    "examples": [
+                        "1",
+                        "10",
+                        "100"
+                    ]
+                }
+            }
+        },
+        "otrosAcuerdos": {
+            "type": "object",
+            "default": false,
+            "title": "OTROS ACUERDOS",
+            "required": [
+                "inclusiva",
+                "exclusivaMujeres",
+                "calidadIndigena"
+            ],
+            "properties": {
+                "inclusiva": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "¿Es inclusiva?",
+                    "enum": [0, 1]
+                },
+                "exclusivaMujeres": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "¿Exclusiva de mujeres?",
+                    "enum": [0, 1]
+                },
+                "calidadIndigena": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "¿Calidad indígena?",
+                    "enum": [0, 1]
+                }
+            }
+        },
+        "cooperadosYAdministradores": {
+            "type": "array",
+            "default": false,
+            "title": "coopadm",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "type": "object",
+                "required": [
+                    "rut",
+                    "dv",
+                    "rutDV",
+                    "primerApellido",
+                    "segundoApellido",
+                    "nombres",
+                    "razonSocial",
+                    "calle",
+                    "numero",
+                    "bloque",
+                    "departamento",
+                    "villaPoblacion",
+                    "region",
+                    "comuna",
+                    "direccion",
+                    "telefono",
+                    "eMail",
+                    "adjuntarDocumento",
+                    "representante",
+                    "calidad",
+                    "capitalDelSocio"
+                ],
+                "properties": {
+                    "rut": {
+                        "type": "integer",
+                        "default": false,
+                        "title": "rut",
+                        "examples": [12345678]
+                    },
+                    "dv": {
+                        "type": "string",
+                        "default": false,
+                        "title": "dv",
+                        "examples": ["0", "1", "k"]
+                    },
+                    "rutDV": {
+                        "type": "string",
+                        "default": false,
+                        "title": "rut+DV",
+                        "examples": ["123456780", "12345678k"]
+                    },
+                    "primerApellido": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Primer apellido",
+                        "examples": ["González"]
+                    },
+                    "segundoApellido": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Segundo apellido",
+                        "examples": ["Muñoz"]
+					},
+                    "nombres": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Nombres",
+                        "examples": ["Juan José"]
+					},
+                    "razonSocial": {
+                        "type": "string",
+                        "default": false,
+                        "title": "RAZÓN SOCIAL",
+                        "examples": ["rznscl" ]
+					},
+                    "calle": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Nombre de la calle",
+                        "examples": ["San Ignacio"]
+					},
+                    "numero": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Número de calle",
+                        "examples": ["063", "13"]
+					},
+                    "bloque": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Nombre del bloque",
+                        "examples": ["3"]
+					},
+                    "departamento": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Número o codigo del departamente",
+                        "examples": ["", "D14", "314"]
+					},
+                    "villaPoblacion": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Nombre de la Villa o Población",
+                        "examples": ["Villa Los Alerces", "Población Rosita Renard"]
+					},
+                    "region": {
+                        "type": "integer",
+                        "default": false,
+                        "title": "Codigo de la Región",
+                        "examples": [1, 16]
+					},
+                    "comuna": {
+                        "type": "integer",
+                        "default": false,
+                        "title": "Codigo de la comuna",
+                        "examples": [1101, 6201]
+					},
+                    "direccion": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Dirección: Concatenar CALLE+NÚMERO+BLOQUE+DPTO+VILLA POBLACIÓN",
+                        "examples": ["San Ignacio 064 3 314 Villa Los Alerces"]
+					},
+                    "telefono": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Numero de Teléfono",
+                        "examples": ["5001001101", "9123456790"]
+					},
+                    "eMail": {
+                        "type": "string",
+                        "default": false,
+                        "title": "E-MAIL",
+                        "examples": ["admin@cooperativa.cl"]
+					},
+                    "adjuntarDocumento": {
+                        "type": "string",
+                        "default": false,
+                        "title": "Adjuntar Documento",
+                        "examples": [
+                            "/DAES/archivo3.txt"
+                        ]
+                    },
+                    "representante": {
+                        "type": "array",
+                        "default": false,
+                        "title": "REPRESENTANTE",
+                        "minItems": 0,
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "rut",
+                                "dv",
+                                "rutDV",
+                                "primerApellido",
+                                "segundoApellido",
+                                "nombres",
+                                "adjuntarPoderRepresentacion"
+                            ],
+                            "properties": {
+                                "rut": {
+                                    "type": "integer",
+                                    "default": false,
+                                    "title": "rut",
+                                    "examples": [12345678]
+								},
+                                "dv": {
+                                    "type": "string",
+                                    "default": false,
+                                    "title": "dv",
+                                    "examples": ["0", "1", "k"]
+								},
+                                "rutDV": {
+                                    "type": "string",
+                                    "default": false,
+                                    "title": "rut+DV",
+                                    "examples": ["123456780", "12345678k"]
+								},
+                                "primerApellido": {
+                                    "type": "string",
+                                    "default": false,
+                                    "title": "Primer apellido",
+                                    "examples": ["González"]
+								},
+                                "segundoApellido": {
+                                    "type": "string",
+                                    "default": false,
+                                    "title": "Segundo apellido",
+                                    "examples": ["Muñoz"]
+								},
+                                "nombres": {
+                                    "type": "string",
+                                    "default": false,
+                                    "title": "Nombres",
+                                    "examples": ["Juan José"]
+								},
+                                "adjuntarPoderRepresentacion": {
+                                    "type": "string",
+                                    "default": false,
+                                    "title": "Adjuntar poder de representación (URL)",
+                                    "examples": ["/DAES/poderRepresentacion.txt"]
+                                }
+                            }
+                        }
+                    },
+                    "calidad": {
+                        "type": "array",
+                        "default": false,
+                        "title": "CALIDAD DEL COOPERADO",
+                        "minItems": 0,
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "object",
+                            "required": ["tipoCalidades"],
+                            "properties": {
+                                "tipoCalidades": {
+                                    "type": "integer",
+                                    "default": false,
+                                    "title": "Tipo de calidades",
+                                    "examples": [1, 2, 11]
+                                }
+                            }
+                        }
+                    },
+                    "capitalDelSocio": {
+                        "type": "array",
+                        "default": false,
+                        "title": "CAPITAL DEL SOCIO",
+                        "minItems": 0,
+                        "uniqueItems": true,
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "tiposAporte",
+                                "cantidadCuotas",
+                                "capitalPagado",
+                                "capitalPorPagar",
+                                "plazoParaPagar",
+                                "formaEnQueSeraEnterado",
+                                "descripcionAporte"
+                            ],
+                            "properties": {
+                                "tiposAporte": {
+									"type": "integer",
+									"default": false,
+									"title": "Tipos aporte",
+									"examples": [1, 2, 3, 4]
+								},
+                                "cantidadCuotas": {
+									"type": "integer",
+									"default": false,
+									"title": "Cantidad cuotas",
+									"examples": [1, 10, 100]
+								},
+                                "capitalPagado": {
+									"type": "integer",
+									"default": false,
+									"title": "Capital pagado",
+									"examples": [1, 10, 100]
+								},
+                                "capitalPorPagar": {
+									"type": "integer",
+									"default": false,
+									"title": "Capital por pagar",
+									"examples": [1, 10, 100]
+								},
+                                "plazoParaPagar": {
+									"type": "integer",
+									"default": false,
+									"title": "Plazo para pagar (meses)",
+									"examples": [1, 10, 100]
+								},
+                                "formaEnQueSeraEnterado": {
+									"type": "string",
+									"default": false,
+									"title": "Forma en que será enterado",
+									"examples": ["mediante mail"]
+								},
+                                "descripcionAporte": {
+									"type": "string",
+									"default": false,
+									"title": "Descripcion del aporte",
+									"examples": ["aporte x"]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "documentos": {
+            "type": "object",
+            "default": false,
+            "title": "DOCUMENTOS",
+            "required": [
+                "escrituraPublicaConstitucion",
+                "inscripcionExtractoCBR",
+                "publicacionDiarioOficial",
+                "otrosDocumentos"
+            ],
+            "properties": {
+                "escrituraPublicaConstitucion": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Escritura publica de constitución",
+                    "examples": [
+                        "/DAES/escrituraPublicaConstitucion.txt"
+                    ]
+                },
+                "inscripcionExtractoCBR": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Inscripción extracto CBR",
+                    "examples": [
+                        "/DAES/inscripcionExtractoCBR.txt"
+                    ]
+                },
+                "publicacionDiarioOficial": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Publicación diario oficial",
+                    "examples": [
+                        "/DAES/publicacionDiarioOficial.txt"
+                    ]
+                },
+                "otrosDocumentos": {
+                    "type": "array",
+                    "default": false,
+                    "title": "OTROS DOCUMENTOS",
+                    "description": "Links con URLs de archivos adicionales adjuntos",
+                    "items": {
+                        "type": "string"
+                    },
+                    "minItems": 0,
+                    "uniqueItems": true,
+                    "examples": [
+                        [
+                            "/DAES/archivo1.txt",
+                            "/DAES/archivo2.txt"
+                        ],
+                        [ ]
+                    ]
+                }
+            }
+        },
+        "datosDelSistema": {
+            "type": "object",
+            "default": false,
+            "title": "DATOS DEL SISTEMA",
+            "required": [
+                "numeroDeAtencion",
+                "numeroTotalSocios",
+                "numeroSociosHombres",
+                "numeroSociasMujeres",
+                "rutSolicitante",
+                "dv",
+                "rutDV",
+                "nombresSolicitante",
+                "primerApellido",
+                "segundoApellido",
+                "emailSolicitante",
+                "fonoSolicitante",
+                "fechaCelebracion"
+            ],
+            "properties": {
+                "numeroDeAtencion": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "RUT del solicitante",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "numeroTotalSocios": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "RUT del solicitante",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "numeroSociosHombres": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "RUT del solicitante",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "numeroSociasMujeres": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "RUT del solicitante",
+                    "examples": [
+                        1,
+                        10,
+                        100
+                    ]
+                },
+                "rutSolicitante": {
+                    "type": "integer",
+                    "default": false,
+                    "title": "RUT del solicitante",
+                    "examples": [
+                        12345678
+                    ]
+                },
+                "dv": {
+                    "type": "string",
+                    "default": false,
+                    "title": "dv",
+                    "examples": [
+                        "0",
+                        "1",
+                        "k"
+                    ]
+                },
+                "rutDV": {
+                    "type": "string",
+                    "default": false,
+                    "title": "rut+DV",
+                    "examples": [
+                        "123456780",
+                        "12345678k"
+                    ]
+                },
+                "nombresSolicitante": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Nombres",
+                    "examples": [
+                        "Juan José"
+                    ]
+                },
+                "primerApellido": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Primer apellido",
+                    "examples": [
+                        "González"
+                    ]
+                },
+                "segundoApellido": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Segundo apellido",
+                    "examples": [
+                        "Muñoz"
+                    ]
+                },
+                "emailSolicitante": {
+                    "type": "string",
+                    "default": false,
+                    "title": "E-MAIL del solicitante",
+                    "examples": [
+                        "solicitante@cooperativa.cl"
+                    ]
+                },
+                "fonoSolicitante": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Numero de Teléfono del solicitante",
+                    "examples": [
+                        "5001001101",
+                        "9123456790"
+                    ]
+                },
+                "fechaCelebracion": {
+                    "type": "string",
+                    "default": false,
+                    "title": "Fecha celebración",
+                    "description": "Fecha del último socio en firmar formulario, (ISO 8601 hasta segundos)",
+                    "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|30|31) [0-2][0-9]:[0-6][0-9]:[0-6][0-9]$",
+                    "examples": [
+                        "2022-09-27 18:00:00"
+                    ]
+                }
+            }
+        }
+    },
+    "examples": [
+        {
+            "objetoSocial": {
+                "rubro": 1,
+                "subRubroEspecifico": 1,
+                "actividades": [1, 2, 3, 181]
+            },
+            "nombreCooperativa": {
+                "razonSocial": "ASOCIACIÓN GREMIAL DE EMPRESARIOS DE BUSES RURALES DE LA PROVINCIA DE CAUTÍN",
+                "nombreFantasiaOSigla": "AGEBRP"
+            },
+            "direccionDeLaCooperativa": {
+                "calle": "San Ignacio",
+                "numero": "063",
+                "bloque": "3",
+                "departamento": "D14",
+                "villaPoblacion": "Villa Los Alerces",
+                "region": 1,
+                "comuna": 1101,
+                "direccion": "San Ignacio 063 3 D14 Villa Los Alerces"
+            },
+            "contactoDeLaCooperativa": {
+                "eMail": "contacto@cooperativa.cl",
+                "telefono": "5001001100",
+                "paginaWeb": "cooperativa.cl"
+            },
+            "capitalDeLaCooperativa": {
+                "montoTotalCapitalInicial":  1234567,
+                "numeroCuotasParticipacion":  1,
+                "valorCuotasPaticipacion":  1000
+            },
+            "duracionDeLaCooperativa": {
+                "indefinido": 1,
+                "anhos": 10
+            },
+            "administracionDeLaCooperativa": {
+                "tipoAdministracion":  1
+            },
+            "consejoAdministracion": {
+                "numeroMiembros":  10,
+                "plazoDuracion":  10,
+                "derechoReeleccion":  1
+            },
+            "juntaDeVigilancia": {
+                "numeroMiembros":  100,
+                "plazoDuracion":  100,
+                "derechoReeleccion":  1
+            },
+            "derechosYObligacionesSocios": {
+                "aporteParaIngresoACooperativa": "10"
+            },
+            "otrosAcuerdos": {
+                "inclusiva":  1,
+                "exclusivaMujeres":  1,
+                "calidadIndigena":  1
+            },
+            "cooperadosYAdministradores": [ 
+                {
+                    "rut": 12345678,
+                    "dv": "0",
+                    "rutDV": "123456780",
+                    "primerApellido": "González",
+                    "segundoApellido": "Muñoz",
+                    "nombres": "Juan José",
+                    "razonSocial": "rznscl",
+                    "calle": "San Ignacio",
+                    "numero": "063",
+                    "bloque": "3",
+                    "departamento": "314",
+                    "villaPoblacion": "Villa Los Alerces",
+                    "region": 1,
+                    "comuna": 1101,
+                    "direccion": "San Ignacio 064 3 314 Villa Los Alerces",
+                    "telefono": "5001001101",
+                    "eMail": "admin@cooperativa.cl",
+                    "adjuntarDocumento" : "/DAES/archivo3.txt",
+                    "representante": [
+                        {
+                            "rut": 12345678,
+                            "dv": "0",
+                            "rutDV": "123456780",
+                            "primerApellido": "González",
+                            "segundoApellido": "Muñoz",
+                            "nombres": "Juan José",
+                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                        },
+                        {
+                            "rut": 12345679,
+                            "dv": "0",
+                            "rutDV": "123456780",
+                            "primerApellido": "González",
+                            "segundoApellido": "Muñoz",
+                            "nombres": "Juan José",
+                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                        }
+                    ],
+                    "calidad": [
+                        {
+                            "tipoCalidades": 2
+                        },
+                        {
+                            "tipoCalidades": 3
+                        }
+                    ],
+                    "capitalDelSocio": [
+                        {
+                            "tiposAporte": 1,
+                            "cantidadCuotas": 10,
+                            "capitalPagado": 100,
+                            "capitalPorPagar": 100,
+                            "plazoParaPagar": 10,
+                            "formaEnQueSeraEnterado": "mediante mail",
+                            "descripcionAporte": "aporte x"
+                        },
+                        {
+                            "tiposAporte": 2,
+                            "cantidadCuotas": 10,
+                            "capitalPagado": 100,
+                            "capitalPorPagar": 100,
+                            "plazoParaPagar": 10,
+                            "formaEnQueSeraEnterado": "mediante mail",
+                            "descripcionAporte": "aporte x"
+                        }
+                    ]
+                },
+                {
+                    "rut": 12345679,
+                    "dv": "0",
+                    "rutDV": "123456780",
+                    "primerApellido": "González",
+                    "segundoApellido": "Muñoz",
+                    "nombres": "Juan José",
+                    "razonSocial": "rznscl",
+                    "calle": "San Ignacio",
+                    "numero": "063",
+                    "bloque": "3",
+                    "departamento": "314",
+                    "villaPoblacion": "Villa Los Alerces",
+                    "region": 1,
+                    "comuna": 1101,
+                    "direccion": "San Ignacio 064 3 314 Villa Los Alerces",
+                    "telefono": "5001001101",
+                    "eMail": "admin@cooperativa.cl",
+                    "adjuntarDocumento" : "/DAES/archivo4.txt",
+                    "representante": [
+                        {
+                            "rut": 12345678,
+                            "dv": "0",
+                            "rutDV": "123456780",
+                            "primerApellido": "González",
+                            "segundoApellido": "Muñoz",
+                            "nombres": "Juan José",
+                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                        },
+                        {
+                            "rut": 12345679,
+                            "dv": "0",
+                            "rutDV": "123456780",
+                            "primerApellido": "González",
+                            "segundoApellido": "Muñoz",
+                            "nombres": "Juan José",
+                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                        }
+                    ],
+                    "calidad": [
+                        {
+                            "tipoCalidades": 2
+                        },
+                        {
+                            "tipoCalidades": 3
+                        }
+                    ],
+                    "capitalDelSocio": [
+                        {
+                            "tiposAporte": 1,
+                            "cantidadCuotas": 10,
+                            "capitalPagado": 100,
+                            "capitalPorPagar": 100,
+                            "plazoParaPagar": 10,
+                            "formaEnQueSeraEnterado": "mediante mail",
+                            "descripcionAporte": "aporte x"
+                        },
+                        {
+                            "tiposAporte": 2,
+                            "cantidadCuotas": 10,
+                            "capitalPagado": 100,
+                            "capitalPorPagar": 100,
+                            "plazoParaPagar": 10,
+                            "formaEnQueSeraEnterado": "mediante mail",
+                            "descripcionAporte": "aporte x"
+                        }
+                    ]
+                }
+            ],
+            "documentos": {
+                "escrituraPublicaConstitucion": "/DAES/escrituraPublicaConstitucion.txt",
+                "inscripcionExtractoCBR": "/DAES/inscripcionExtractoCBR.txt",
+                "publicacionDiarioOficial": "/DAES/publicacionDiarioOficial.txt",
+                "otrosDocumentos": ["/DAES/archivo1.txt","/DAES/archivo2.txt"]
+            },
+            "datosDelSistema": {
+                "numeroDeAtencion": 100,
+                "numeroTotalSocios": 100,
+                "numeroSociosHombres": 10,
+                "numeroSociasMujeres": 10,
+                "rutSolicitante": 12345678,
+                "dv": "0",
+                "rutDV": "123456780",
+                "nombresSolicitante": "Juan José",
+                "primerApellido": "González",
+                "segundoApellido": "Muñoz",
+                "emailSolicitante": "solicitante@cooperativa.cl",
+                "fonoSolicitante": "5001001101",
+                "fechaCelebracion": "2022-09-27 18:00:00"
+            }
+        }
+    ]
+}
