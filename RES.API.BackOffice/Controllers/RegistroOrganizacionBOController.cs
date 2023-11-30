@@ -33,15 +33,11 @@ namespace App.API.Controllers
             try
             {
                 _cache.TryGetValue("MensajeOrganizacionRES", out string organizacionRESSchema);
-                Console.WriteLine("schema");
                 var schema = JsonSchema.FromJsonAsync(organizacionRESSchema).Result;
                 var validator = new JsonSchemaValidator();
-                Console.WriteLine("valid");
                 var validation = validator.Validate(jsonDocument.RootElement.ToString(), schema);
                 if (validation.Count != 0) { return BadRequest("json invalido"); }
-                Console.WriteLine("doc");
                 MensajeOrganizacionRES registroOrganizacionBO = jsonDocument.Deserialize<MensajeOrganizacionRES>();
-                Console.WriteLine("org");
                 Organizacion org = new Organizacion
                 {
                     TipoOrganizacionId = 1,
@@ -61,11 +57,11 @@ namespace App.API.Controllers
                     NumeroSocios = registroOrganizacionBO.DatosDelSistema.NumeroTotalSocios,
                     NumeroSociosHombres = registroOrganizacionBO.DatosDelSistema.NumeroSociosHombres,
                     NumeroSociosMujeres = registroOrganizacionBO.DatosDelSistema.NumeroSociasMujeres,
-                    EstadoId = 2,                  //
+                    EstadoId = 6, // rol asignado
                     NumeroSociosConstituyentes = 0,//
                     EsImportanciaEconomica = false //valores obligatorios de origanizacion, no vienen en el mensaje RES
                 };
-                _dbContext.Organizacion.Add(org);
+                _dbContext.Organizaciones.Add(org);
                 _dbContext.SaveChanges();
                 return Ok(registroOrganizacionBO.ContactoDeLaCooperativa.EMail);
             }

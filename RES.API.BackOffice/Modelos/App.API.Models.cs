@@ -13,7 +13,13 @@ namespace DAES.API.BackOffice.Modelos
             optionsBuilder.EnableSensitiveDataLogging();
         }
 
-        public DbSet<Organizacion> Organizacion { get; set; }
+        public DbSet<Organizacion> Organizaciones { get; set; }
+        public DbSet<Proceso> Procesos { get; set; }
+        public DbSet<Solicitante> Solicitantes { get; set; }
+        public DbSet<Documento> Documentos { get; set; }
+        public DbSet<Workflow> Workflows { get; set; }
+        public DbSet<DefinicionProceso> DefinicionProcesos { get; set; }
+        public DbSet<DefinicionWorkflow> DefinicionWorkflows { get; set; }
 
         // Otro código de configuración de DbContext
     }

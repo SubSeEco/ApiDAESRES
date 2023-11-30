@@ -21,7 +21,7 @@ namespace App.API.Controllers
         public IActionResult Get(string RazonSocial)
         {
             // Puedes realizar operaciones en la base de datos utilizando _dbContext
-            var datos = _dbContext.Organizacion.Where(q => q.RazonSocial == RazonSocial);
+            var datos = _dbContext.Organizaciones.Where(q => q.RazonSocial == RazonSocial);
 
             if (datos.Any())
             {
