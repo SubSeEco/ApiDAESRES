@@ -74,6 +74,7 @@ namespace App.API.Controllers
                                                              s.Email == solicitante.Email &&
                                                              s.Fono == solicitante.Fono);
             var now = DateTime.Now;
+            DateTime FechaTermino = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == 1127).Duracion);
             Organizacion organizacion = new Organizacion();
             try
             {
@@ -110,15 +111,83 @@ namespace App.API.Controllers
                 SolicitanteId = solicitante.SolicitanteId,
                 DefinicionProcesoId = 1127,
                 FechaCreacion = now,
-                FechaVencimiento = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == 1127).Duracion),
+                FechaVencimiento = FechaTermino,
                 Terminada = false
             };
             _dbContext.Procesos.Add(proceso);
             _dbContext.SaveChanges();
             proceso = _dbContext.Procesos.Where(q => q.OrganizacionId == organizacion.OrganizacionId).OrderBy(q => q.ProcesoId).Last();
-            /*
-            subir documentos
-            */
+
+            Workflow workflow = new Workflow()
+            {
+                ProcesoId = proceso.ProcesoId,
+                FechaCreacion = now,
+                FechaTermino = FechaTermino,
+                DefinicionWorkflowId = 1231,
+                UserId = "980c4a71-7d34-4fc7-89bd-012b3e41590f",
+                TipoAprobacionId = 1
+            };
+            workflow = _dbContext.Workflows.Where(q => q.ProcesoId == proceso.ProcesoId).FirstOrDefault();
+
+            List<Documento> documentos = new List<Documento>();
+            documentos.Add(new Documento()
+            {
+                Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial,
+                Activo = true,
+                OrganizacionId = organizacion.OrganizacionId,
+                ProcesoId = proceso.ProcesoId,
+                WorkflowId = workflow.WorkflowId,
+                FechaCreacion = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == 1127).Duracion),
+                //FechaValidoHasta = FechaTermino,
+                //Descripcion = "Publicacion del diario oficial" 
+                Enviado = false,
+                //TipoDocumentoCodigo = 
+            });
+            documentos.Add(new Documento()
+            {
+                Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial,
+                Activo = true,
+                OrganizacionId = organizacion.OrganizacionId,
+                ProcesoId = proceso.ProcesoId,
+                WorkflowId = workflow.WorkflowId,
+                FechaCreacion = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == 1127).Duracion),
+                //FechaValidoHasta = FechaTermino,
+                //Descripcion = "Publicacion del diario oficial" 
+                Enviado = false,
+                //TipoDocumentoCodigo = 
+            });
+            documentos.Add(new Documento()
+            {
+                Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial,
+                Activo = true,
+                OrganizacionId = organizacion.OrganizacionId,
+                ProcesoId = proceso.ProcesoId,
+                WorkflowId = workflow.WorkflowId,
+                FechaCreacion = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == 1127).Duracion),
+                //FechaValidoHasta = FechaTermino,
+                //Descripcion = "Publicacion del diario oficial" 
+                Enviado = false,
+                //TipoDocumentoCodigo = 
+            });
+            foreach (string otroDocumento in mensajeOrganizacionesRES.Documentos.OtrosDocumentos)
+            {
+                documentos.Add(new Documento()
+                {
+                    Url = otroDocumento,
+                    Activo = true,
+                    OrganizacionId = organizacion.OrganizacionId,
+                    ProcesoId = proceso.ProcesoId,
+                    WorkflowId = workflow.WorkflowId,
+                    FechaCreacion = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == 1127).Duracion),
+                    //FechaValidoHasta = FechaTermino, 
+                    Enviado = false 
+                });
+            }
+            foreach (Documento documento in documentos)
+            {
+                _dbContext.Procesos.Add(proceso);
+            }_dbContext.SaveChanges();
+
             return Ok($"{{\"ProcesoId\": \"{proceso.ProcesoId}\"}}");
         }
     }
