@@ -59,8 +59,8 @@ namespace App.API.Controllers
                     NumeroSocios = mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios,
                     NumeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
                     NumeroSociosMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
-                    EstadoId = (int)Enum.Estado.EnConstitucion,
-                    NumeroSociosConstituyentes = 0,
+                    EstadoId = (int)Enum.Estado.RolAsignado,
+                    NumeroSociosConstituyentes = 0,//
                     EsImportanciaEconomica = false //valores obligatorios de origanizacion, no vienen en el mensaje RES
                 };
                 _dbContext.Organizaciones.Add(organizacion);
@@ -80,15 +80,15 @@ namespace App.API.Controllers
                     Email = mensajeOrganizacionesRES.ContactoDeLaCooperativa.EMail,
                     Fono = mensajeOrganizacionesRES.ContactoDeLaCooperativa.Telefono,
                     URL = mensajeOrganizacionesRES.ContactoDeLaCooperativa.PaginaWeb,
-                    EsGeneroFemenino = (mensajeOrganizacionesRES.OtrosAcuerdos.ExclusivaMujeres == 1), // enum en contrato 1: verdadero, 0: falso
+                    EsGeneroFemenino = (mensajeOrganizacionesRES.OtrosAcuerdos.ExclusivaMujeres == 1),
                     FechaCelebracion = DateTime.ParseExact(mensajeOrganizacionesRES.DatosDelSistema.FechaCelebracion, "yyyy-MM-dd HH:mm:ss",
                                        System.Globalization.CultureInfo.InvariantCulture),
                     NumeroSocios = mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios,
                     NumeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
                     NumeroSociosMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
-                    EstadoId = (int)Enum.Estado.EnConstitucion,
+                    EstadoId = (int)Enum.Estado.RolAsignado,
                     NumeroSociosConstituyentes = 0,
-                    EsImportanciaEconomica = false //valores obligatorios de origanizacion, no vienen en el mensaje RES
+                    EsImportanciaEconomica = false
                 };
                 _dbContext.ActualizacionOrganizaciones.Add(actualizacionOrganizacion);
                 _dbContext.SaveChanges();
@@ -228,8 +228,8 @@ namespace App.API.Controllers
                     _dbContext.Documentos.Add(documento);
                 }
                 _dbContext.SaveChanges();
-
-                return Ok($"{{\"ProcesoId\": \"{proceso.ProcesoId}\"}}");
+                
+                return Ok($"{{\"ProcesoId\": {proceso.ProcesoId}}}");
             }
             catch (DbUpdateException ex)
             {
