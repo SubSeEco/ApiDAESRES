@@ -68,6 +68,7 @@ namespace App.API.Controllers
                 _dbContext.Solicitantes.Add(solicitante);
                 _dbContext.SaveChanges();
             }
+
             solicitante = _dbContext.Solicitantes.First(s => s.Rut == solicitante.Rut &&
                                                              s.Nombres == solicitante.Nombres &&
                                                              s.Apellidos == solicitante.Apellidos &&
@@ -131,7 +132,7 @@ namespace App.API.Controllers
                 _dbContext.SaveChanges();
                 persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == 11 && q.TareaAsignadaApi == false);
             }
-
+            persona.TareaAsignadaApi = true;
 
 
             Workflow workflow = new Workflow()
@@ -141,15 +142,12 @@ namespace App.API.Controllers
                 FechaTermino = FechaTermino,
                 DefinicionWorkflowId = 1231,
                 UserId = persona.Id,
-                //"980c4a71-7d34-4fc7-89bd-012b3e41590f"
-
-
                 TipoAprobacionId = 1
             };
-            workflow = _dbContext.Workflows.Where(q => q.ProcesoId == proceso.ProcesoId).FirstOrDefault();
 
-            persona.TareaAsignadaApi = true;
-
+            
+            _dbContext.Add(workflow);
+            _dbContext.SaveChanges();
             List<Documento> documentos = new List<Documento>();
             documentos.Add(new Documento()
             {
@@ -206,8 +204,9 @@ namespace App.API.Controllers
             }
             foreach (Documento documento in documentos)
             {
-                _dbContext.Procesos.Add(proceso);
-            }_dbContext.SaveChanges();
+                _dbContext.Documentos.Add(documento);
+            }
+            _dbContext.SaveChanges();
 
             return Ok($"{{\"ProcesoId\": \"{proceso.ProcesoId}\"}}");
         }
