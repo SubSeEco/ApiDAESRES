@@ -7,6 +7,7 @@ using RES.API.BackOffice;
 using DAES.API.BackOffice.Modelos;
 using Microsoft.EntityFrameworkCore;
 using Enum = DAES.API.BackOffice.Modelos.Enum;
+using RES.API.BackOffice.Modelos;
 
 namespace App.API.Controllers
 {
@@ -38,10 +39,10 @@ namespace App.API.Controllers
                 var validation = validator.Validate(jsonDocument.RootElement.ToString(), schema);
                 if (validation.Count != 0) { return BadRequest("json invalido"); }
                 MensajeOrganizacionRES mensajeOrganizacionesRES = jsonDocument.Deserialize<MensajeOrganizacionRES>();
-                Organizacion org = new Organizacion
+                Organizacion organizacion = new Organizacion
                 {
                     TipoOrganizacionId = (int)Enum.TipoOrganizacion.Cooperativa,
-                    SituacionId = (int)Enum.Situacion.Inactiva, 
+                    SituacionId = (int)Enum.Situacion.Inactiva,
                     RubroId = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
                     SubRubroId = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
                     RazonSocial = mensajeOrganizacionesRES.NombreCooperativa.RazonSocial,
@@ -59,33 +60,38 @@ namespace App.API.Controllers
                     NumeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
                     NumeroSociosMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
                     EstadoId = (int)Enum.Estado.EnConstitucion,
-                    NumeroSociosConstituyentes = 0, //
+                    NumeroSociosConstituyentes = 0,
                     EsImportanciaEconomica = false //valores obligatorios de origanizacion, no vienen en el mensaje RES
                 };
-                _dbContext.Organizaciones.Add(org);
+                _dbContext.Organizaciones.Add(organizacion);
                 _dbContext.SaveChanges();
-                Organizacion organizacion = _dbContext.Organizaciones.Where(o =>
-                    o.TipoOrganizacionId == (int)Enum.TipoOrganizacion.Cooperativa &&
-                    o.SituacionId == (int)Enum.Situacion.Inactiva &&
-                    o.RubroId == mensajeOrganizacionesRES.ObjetoSocial.Rubro &&
-                    o.SubRubroId == mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico &&
-                    o.RazonSocial == mensajeOrganizacionesRES.NombreCooperativa.RazonSocial &&
-                    o.Sigla == mensajeOrganizacionesRES.NombreCooperativa.NombreFantasiaOSigla &&
-                    o.RegionId == mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region &&
-                    o.ComunaId == mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna &&
-                    o.Direccion == mensajeOrganizacionesRES.DireccionDeLaCooperativa.Direccion &&
-                    o.Email == mensajeOrganizacionesRES.ContactoDeLaCooperativa.EMail &&
-                    o.Fono == mensajeOrganizacionesRES.ContactoDeLaCooperativa.Telefono &&
-                    o.URL == mensajeOrganizacionesRES.ContactoDeLaCooperativa.PaginaWeb &&
-                    o.EsGeneroFemenino == (mensajeOrganizacionesRES.OtrosAcuerdos.ExclusivaMujeres == 1) &&
-                    o.FechaCelebracion == DateTime.ParseExact(mensajeOrganizacionesRES.DatosDelSistema.FechaCelebracion, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) &&
-                    o.NumeroSocios == mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios &&
-                    o.NumeroSociosHombres == mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres &&
-                    o.NumeroSociosMujeres == mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres &&
-                    o.EstadoId == (int)Enum.Estado.EnConstitucion &&
-                    o.NumeroSociosConstituyentes == 0 &&
-                    o.EsImportanciaEconomica == false
-                ).OrderByDescending(q => q.OrganizacionId).First();
+                ActualizacionOrganizacion actualizacionOrganizacion = new ActualizacionOrganizacion
+                {
+                    OrganizacionId = organizacion.OrganizacionId,
+                    TipoOrganizacionId = (int)Enum.TipoOrganizacion.Cooperativa,
+                    SituacionId = (int)Enum.Situacion.Inactiva,
+                    RubroId = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
+                    SubRubroId = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
+                    RazonSocial = mensajeOrganizacionesRES.NombreCooperativa.RazonSocial,
+                    Sigla = mensajeOrganizacionesRES.NombreCooperativa.NombreFantasiaOSigla,
+                    RegionId = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region,
+                    ComunaId = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna,
+                    Direccion = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Direccion,
+                    Email = mensajeOrganizacionesRES.ContactoDeLaCooperativa.EMail,
+                    Fono = mensajeOrganizacionesRES.ContactoDeLaCooperativa.Telefono,
+                    URL = mensajeOrganizacionesRES.ContactoDeLaCooperativa.PaginaWeb,
+                    EsGeneroFemenino = (mensajeOrganizacionesRES.OtrosAcuerdos.ExclusivaMujeres == 1), // enum en contrato 1: verdadero, 0: falso
+                    FechaCelebracion = DateTime.ParseExact(mensajeOrganizacionesRES.DatosDelSistema.FechaCelebracion, "yyyy-MM-dd HH:mm:ss",
+                                       System.Globalization.CultureInfo.InvariantCulture),
+                    NumeroSocios = mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios,
+                    NumeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
+                    NumeroSociosMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
+                    EstadoId = (int)Enum.Estado.EnConstitucion,
+                    NumeroSociosConstituyentes = 0,
+                    EsImportanciaEconomica = false //valores obligatorios de origanizacion, no vienen en el mensaje RES
+                };
+                _dbContext.ActualizacionOrganizaciones.Add(actualizacionOrganizacion);
+                _dbContext.SaveChanges();
 
 
                 Solicitante solicitante = new Solicitante()
@@ -107,20 +113,23 @@ namespace App.API.Controllers
                     _dbContext.Solicitantes.Add(solicitante);
                     _dbContext.SaveChanges();
                 }
+                else
+                {
+                    solicitante = _dbContext.Solicitantes.First(s => s.Rut == solicitante.Rut &&
+                                                                     s.Nombres == solicitante.Nombres &&
+                                                                     s.Apellidos == solicitante.Apellidos &&
+                                                                     s.Email == solicitante.Email &&
+                                                                     s.Fono == solicitante.Fono);
+                }
 
-                solicitante = _dbContext.Solicitantes.First(s => s.Rut == solicitante.Rut &&
-                                                                 s.Nombres == solicitante.Nombres &&
-                                                                 s.Apellidos == solicitante.Apellidos &&
-                                                                 s.Email == solicitante.Email &&
-                                                                 s.Fono == solicitante.Fono);
-                
+
                 var now = DateTime.Now;
                 DateTime FechaTermino = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == (int)Enum.DefinicionProceso.InscripcionConstitucionRES).Duracion);
 
 
                 Proceso proceso = new Proceso()
                 {
-                    OrganizacionId = organizacion.OrganizacionId,
+                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
                     SolicitanteId = solicitante.SolicitanteId,
                     DefinicionProcesoId = (int)Enum.DefinicionProceso.InscripcionConstitucionRES,
                     FechaCreacion = now,
@@ -130,7 +139,7 @@ namespace App.API.Controllers
                 };
                 _dbContext.Procesos.Add(proceso);
                 _dbContext.SaveChanges();
-                proceso = _dbContext.Procesos.Where(q => q.OrganizacionId == organizacion.OrganizacionId).OrderBy(q => q.ProcesoId).Last();
+
                 //aqui asignamos la persona con el perfil perfilAPI y que este sin asignacion por el momento 
                 var persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == (int)Enum.Perfil.perfilAPI && q.TareaAsignadaApi == false);
                 if (persona == null)
@@ -156,16 +165,16 @@ namespace App.API.Controllers
                     UserId = persona.Id,
                     TipoAprobacionId = (int)Enum.TipoAprobacion.SinAprobacion
                 };
-
-
                 _dbContext.Add(workflow);
                 _dbContext.SaveChanges();
+
+
                 List<Documento> documentos = new List<Documento>();
                 documentos.Add(new Documento()
                 {
                     Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial,
                     Activo = true,
-                    OrganizacionId = organizacion.OrganizacionId,
+                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
                     FechaCreacion = now,
@@ -178,7 +187,7 @@ namespace App.API.Controllers
                 {
                     Url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR,
                     Activo = true,
-                    OrganizacionId = organizacion.OrganizacionId,
+                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
                     FechaCreacion = now,
@@ -191,7 +200,7 @@ namespace App.API.Controllers
                 {
                     Url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion,
                     Activo = true,
-                    OrganizacionId = organizacion.OrganizacionId,
+                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
                     FechaCreacion = now,
@@ -206,7 +215,7 @@ namespace App.API.Controllers
                     {
                         Url = otroDocumento,
                         Activo = true,
-                        OrganizacionId = organizacion.OrganizacionId,
+                        OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
                         ProcesoId = proceso.ProcesoId,
                         WorkflowId = workflow.WorkflowId,
                         FechaCreacion = now,
@@ -224,7 +233,8 @@ namespace App.API.Controllers
             }
             catch (DbUpdateException ex)
             {
-                return BadRequest($"{{\"message\": \"error en actualizar sistema integrado\", \"entries\": \"{ex.Entries}\"}}");
+                string entries = "[" + string.Join(", ", ex.Entries) + "]";
+                return BadRequest($"{{\"message\": \"error en actualizar sistema integrado\", \"entries\": \"{entries}\"}}");
             }
         }
     }

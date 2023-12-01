@@ -15,6 +15,7 @@ namespace DAES.API.BackOffice.Modelos
         }
 
         public DbSet<Organizacion> Organizaciones { get; set; }
+        public DbSet<ActualizacionOrganizacion> ActualizacionOrganizaciones { get; set; }
         public DbSet<Proceso> Procesos { get; set; }
         public DbSet<Solicitante> Solicitantes { get; set; }
         public DbSet<Documento> Documentos { get; set; }
