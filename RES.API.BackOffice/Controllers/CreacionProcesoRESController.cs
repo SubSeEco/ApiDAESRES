@@ -112,11 +112,27 @@ namespace App.API.Controllers
                 DefinicionProcesoId = 1127,
                 FechaCreacion = now,
                 FechaVencimiento = FechaTermino,
-                Terminada = false
+                Terminada = false,
+                Creador ="ApiRes"
             };
             _dbContext.Procesos.Add(proceso);
             _dbContext.SaveChanges();
             proceso = _dbContext.Procesos.Where(q => q.OrganizacionId == organizacion.OrganizacionId).OrderBy(q => q.ProcesoId).Last();
+            //aqui asignamos la persona con el perfil 11 y que este sin asignacion por el momento 
+            var persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == 11 && q.TareaAsignadaApi == false);
+            if (persona == null)
+            {
+                var personas = _dbContext.NetUsers.Where(q => q.PerfilId == 11 && q.TareaAsignadaApi == true);
+                foreach ( var p in personas)
+                {
+                    p.TareaAsignadaApi = false;
+
+                }
+                _dbContext.SaveChanges();
+                persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == 11 && q.TareaAsignadaApi == false);
+            }
+
+
 
             Workflow workflow = new Workflow()
             {
@@ -124,10 +140,15 @@ namespace App.API.Controllers
                 FechaCreacion = now,
                 FechaTermino = FechaTermino,
                 DefinicionWorkflowId = 1231,
-                UserId = "980c4a71-7d34-4fc7-89bd-012b3e41590f",
+                UserId = persona.Id,
+                //"980c4a71-7d34-4fc7-89bd-012b3e41590f"
+
+
                 TipoAprobacionId = 1
             };
             workflow = _dbContext.Workflows.Where(q => q.ProcesoId == proceso.ProcesoId).FirstOrDefault();
+
+            persona.TareaAsignadaApi = true;
 
             List<Documento> documentos = new List<Documento>();
             documentos.Add(new Documento()
