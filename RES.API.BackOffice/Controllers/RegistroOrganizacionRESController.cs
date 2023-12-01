@@ -65,6 +65,7 @@ namespace App.API.Controllers
                 };
                 _dbContext.Organizaciones.Add(organizacion);
                 _dbContext.SaveChanges();
+                /*
                 ActualizacionOrganizacion actualizacionOrganizacion = new ActualizacionOrganizacion
                 {
                     OrganizacionId = organizacion.OrganizacionId,
@@ -92,7 +93,7 @@ namespace App.API.Controllers
                 };
                 _dbContext.ActualizacionOrganizaciones.Add(actualizacionOrganizacion);
                 _dbContext.SaveChanges();
-
+                */
 
                 Solicitante solicitante = new Solicitante()
                 {
@@ -129,7 +130,7 @@ namespace App.API.Controllers
 
                 Proceso proceso = new Proceso()
                 {
-                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
+                    OrganizacionId = organizacion.OrganizacionId,//
                     SolicitanteId = solicitante.SolicitanteId,
                     DefinicionProcesoId = (int)Enum.DefinicionProceso.InscripcionConstitucionRES,
                     FechaCreacion = now,
@@ -139,6 +140,12 @@ namespace App.API.Controllers
                 };
                 _dbContext.Procesos.Add(proceso);
                 _dbContext.SaveChanges();
+
+                /*
+                actualizacionOrganizacion.ProcesoId = proceso.ProcesoId;
+                _dbContext.Procesos.Update(proceso);
+                _dbContext.SaveChanges();
+                */
 
                 //aqui asignamos la persona con el perfil perfilAPI y que este sin asignacion por el momento 
                 var persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == (int)Enum.Perfil.perfilAPI && q.TareaAsignadaApi == false);
@@ -174,7 +181,7 @@ namespace App.API.Controllers
                 {
                     Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial,
                     Activo = true,
-                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
+                    OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
                     FechaCreacion = now,
@@ -187,7 +194,7 @@ namespace App.API.Controllers
                 {
                     Url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR,
                     Activo = true,
-                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
+                    OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
                     FechaCreacion = now,
@@ -200,7 +207,7 @@ namespace App.API.Controllers
                 {
                     Url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion,
                     Activo = true,
-                    OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
+                    OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
                     FechaCreacion = now,
@@ -215,7 +222,7 @@ namespace App.API.Controllers
                     {
                         Url = otroDocumento,
                         Activo = true,
-                        OrganizacionId = actualizacionOrganizacion.ActualizacionOrganizacionId,//
+                        OrganizacionId = organizacion.OrganizacionId,//
                         ProcesoId = proceso.ProcesoId,
                         WorkflowId = workflow.WorkflowId,
                         FechaCreacion = now,
