@@ -73,7 +73,7 @@ namespace App.API
             public string Telefono { get; set; }
 
             [JsonPropertyName("paginaWeb")]
-            public string? PaginaWeb { get; set; }
+            public string PaginaWeb { get; set; }
 
             internal bool NullParameter()
             {
@@ -148,43 +148,43 @@ namespace App.API
         public class DatosDelSistema
         {
             [JsonPropertyName("numeroDeAtencion")]
-            public int? NumeroDeAtencion { get; set; }
+            public int NumeroDeAtencion { get; set; }
 
             [JsonPropertyName("numeroTotalSocios")]
-            public int? NumeroTotalSocios { get; set; }
+            public int NumeroTotalSocios { get; set; }
 
             [JsonPropertyName("numeroSociosHombres")]
-            public int? NumeroSociosHombres { get; set; }
+            public int NumeroSociosHombres { get; set; }
 
             [JsonPropertyName("numeroSociasMujeres")]
-            public int? NumeroSociasMujeres { get; set; }
+            public int NumeroSociasMujeres { get; set; }
 
             [JsonPropertyName("rutSolicitante")]
-            public int? RutSolicitante { get; set; }
+            public int RutSolicitante { get; set; }
 
             [JsonPropertyName("dv")]
-            public string? Dv { get; set; }
+            public string Dv { get; set; }
 
             [JsonPropertyName("rutDV")]
-            public string? RutDV { get; set; }
+            public string RutDV { get; set; }
 
             [JsonPropertyName("nombresSolicitante")]
-            public string? NombresSolicitante { get; set; }
+            public string NombresSolicitante { get; set; }
 
             [JsonPropertyName("primerApellido")]
-            public string? PrimerApellido { get; set; }
+            public string PrimerApellido { get; set; }
 
             [JsonPropertyName("segundoApellido")]
-            public string? SegundoApellido { get; set; }
+            public string SegundoApellido { get; set; }
 
             [JsonPropertyName("emailSolicitante")]
-            public string? EmailSolicitante { get; set; }
+            public string EmailSolicitante { get; set; }
 
             [JsonPropertyName("fonoSolicitante")]
-            public string? FonoSolicitante { get; set; }
+            public string FonoSolicitante { get; set; }
 
             [JsonPropertyName("fechaCelebracion")]
-            public string? FechaCelebracion { get; set; }
+            public string FechaCelebracion { get; set; }
 
             internal bool NullParameter()
             {
@@ -201,19 +201,19 @@ namespace App.API
         public class DireccionDeLaCooperativa
         {
             [JsonPropertyName("calle")]
-            public string? Calle { get; set; }
+            public string Calle { get; set; }
 
             [JsonPropertyName("numero")]
-            public string? Numero { get; set; }
+            public string Numero { get; set; }
 
             [JsonPropertyName("bloque")]
-            public string? Bloque { get; set; }
+            public string Bloque { get; set; }
 
             [JsonPropertyName("departamento")]
-            public string? Departamento { get; set; }
+            public string Departamento { get; set; }
 
             [JsonPropertyName("villaPoblacion")]
-            public string? VillaPoblacion { get; set; }
+            public string VillaPoblacion { get; set; }
 
             [JsonPropertyName("region")]
             public int Region { get; set; }
@@ -280,7 +280,7 @@ namespace App.API
             public string RazonSocial { get; set; }
 
             [JsonPropertyName("nombreFantasiaOSigla")]
-            public string? NombreFantasiaOSigla { get; set; }
+            public string NombreFantasiaOSigla { get; set; }
 
             internal bool NullParameter()
             {
@@ -297,7 +297,7 @@ namespace App.API
             public int SubRubroEspecifico { get; set; }
 
             [JsonPropertyName("actividades")]
-            public List<int>? Actividades { get; set; }
+            public List<int> Actividades { get; set; }
 
             internal bool NullParameter()
             {
@@ -325,22 +325,22 @@ namespace App.API
         public class Representante
         {
             [JsonPropertyName("rut")]
-            public int? Rut { get; set; }
+            public int Rut { get; set; }
 
             [JsonPropertyName("dv")]
-            public string? Dv { get; set; }
+            public string Dv { get; set; }
 
             [JsonPropertyName("rutDV")]
-            public string? RutDV { get; set; }
+            public string RutDV { get; set; }
 
             [JsonPropertyName("primerApellido")]
-            public string? PrimerApellido { get; set; }
+            public string PrimerApellido { get; set; }
 
             [JsonPropertyName("segundoApellido")]
-            public string? SegundoApellido { get; set; }
+            public string SegundoApellido { get; set; }
 
             [JsonPropertyName("nombres")]
-            public string? Nombres { get; set; }
+            public string Nombres { get; set; }
 
             [JsonPropertyName("adjuntarPoderRepresentacion")]
             public string AdjuntarPoderRepresentacion { get; set; }
