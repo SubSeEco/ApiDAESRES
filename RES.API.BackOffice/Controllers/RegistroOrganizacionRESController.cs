@@ -188,7 +188,8 @@ namespace App.API.Controllers
                 List<Documento> documentos = new List<Documento>();
                 documentos.Add(new Documento()
                 {
-                    Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial,
+                    FileName = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.NombreArchivo,
+                    Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.URL,
                     Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
@@ -201,7 +202,8 @@ namespace App.API.Controllers
                 });
                 documentos.Add(new Documento()
                 {
-                    Url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR,
+                    Url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.URL,
+                    FileName = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.NombreArchivo,
                     Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
@@ -214,7 +216,8 @@ namespace App.API.Controllers
                 });
                 documentos.Add(new Documento()
                 {
-                    Url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion,
+                    Url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.URL,
+                    FileName = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.NombreArchivo,
                     Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
@@ -225,11 +228,12 @@ namespace App.API.Controllers
                     Enviado = false,
                     //TipoDocumentoCodigo = 
                 });
-                foreach (string otroDocumento in mensajeOrganizacionesRES.Documentos.OtrosDocumentos)
+                foreach (ModulosRES.Documento otroDocumento in mensajeOrganizacionesRES.Documentos.OtrosDocumentos)
                 {
                     documentos.Add(new Documento()
                     {
-                        Url = otroDocumento,
+                        Url = otroDocumento.URL,
+                        FileName = otroDocumento.NombreArchivo,
                         Activo = false,
                         OrganizacionId = organizacion.OrganizacionId,//
                         ProcesoId = proceso.ProcesoId,
