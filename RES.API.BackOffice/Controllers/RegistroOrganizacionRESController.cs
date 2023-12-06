@@ -41,9 +41,15 @@ namespace App.API.Controllers
                 var validation = validator.Validate(jsonDocument.RootElement.ToString(), schema);
                 if (validation.Count != 0) { return BadRequest("json invalido"); }
                 MensajeOrganizacionRES mensajeOrganizacionesRES = jsonDocument.Deserialize<MensajeOrganizacionRES>();
+
+                Rol rol = new Rol();
+                _dbContext.Roles.Add(rol);
+                _dbContext.SaveChanges();
+
                 Organizacion organizacion = new Organizacion
                 {
                     TipoOrganizacionId = (int)Enum.TipoOrganizacion.Cooperativa,
+                    NumeroRegistro = rol.RolId.ToString(),
                     SituacionId = (int)Enum.Situacion.Inactiva,
                     RubroId = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
                     SubRubroId = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
