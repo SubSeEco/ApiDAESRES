@@ -135,6 +135,9 @@ namespace App.API
             [JsonPropertyName("eMail")]
             public string EMail { get; set; }
 
+            [JsonPropertyName("adjuntarDocumento")]
+            public Documento AdjuntarDocumento { get; set; }
+
             [JsonPropertyName("representante")]
             public List<Representante> Representante { get; set; }
 
@@ -233,16 +236,16 @@ namespace App.API
         public class Documentos
         {
             [JsonPropertyName("escrituraPublicaConstitucion")]
-            public string EscrituraPublicaConstitucion { get; set; }
+            public Documento EscrituraPublicaConstitucion { get; set; }
 
             [JsonPropertyName("inscripcionExtractoCBR")]
-            public string InscripcionExtractoCBR { get; set; }
+            public Documento InscripcionExtractoCBR { get; set; }
 
             [JsonPropertyName("publicacionDiarioOficial")]
-            public string PublicacionDiarioOficial { get; set; }
+            public Documento PublicacionDiarioOficial { get; set; }
 
             [JsonPropertyName("otrosDocumentos")]
-            public List<string> OtrosDocumentos { get; set; }
+            public List<Documento> OtrosDocumentos { get; set; }
 
             internal bool NullParameter()
             {
@@ -343,7 +346,28 @@ namespace App.API
             public string Nombres { get; set; }
 
             [JsonPropertyName("adjuntarPoderRepresentacion")]
-            public string AdjuntarPoderRepresentacion { get; set; }
+            public Documento AdjuntarPoderRepresentacion { get; set; }
+        }
+
+        public class Documento
+        {
+            private string _fileName;
+
+            [JsonPropertyName("url")]
+            public string URL { get; set; }
+
+            [JsonPropertyName("nombreArchivo")]
+            public string NombreArchivo {
+                get
+                {
+                    if (string.IsNullOrWhiteSpace(_fileName))
+                    {
+                        return "indefinido";
+                    }
+                    return _fileName;
+                }
+                set { _fileName = value; }
+            }
         }
 
     }

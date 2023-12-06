@@ -5,8 +5,12 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.IO;
 using DAES.API.BackOffice.Modelos;
+using static App.API.Controllers.RegistroOrganizacionRESController;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// add document upload filter
+builder.Services.AddScoped<PostMethodFilter>();
 
 // Add services to the container.
 builder.Services.AddControllers();

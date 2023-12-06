@@ -1,8 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2019-09/schema",
+    "version": "1.1",
     "type": "object",
     "default": false,
-    "title": "Schema constitucion RES",
+    "title": "Schema constitucion RES v1.1",
     "required": [
         "objetoSocial",
         "nombreCooperativa",
@@ -577,12 +578,29 @@
                         "examples": ["admin@cooperativa.cl"]
 					},
                     "adjuntarDocumento": {
-                        "type": "string",
+                        "type": "object",
                         "default": false,
                         "title": "Adjuntar Documento",
-                        "examples": [
-                            "/DAES/archivo3.txt"
-                        ]
+                        "required": [
+                            "url",
+                            "nombreArchivo"
+                        ],
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "default": false,
+                                "examples": [
+                                    "www.url.cl/id123"
+                                ]
+                            },
+                            "nombreArchivo": {
+                                "type": "string",
+                                "default": false,
+                                "examples": [
+                                    "archivo3.txt"
+                                ]
+                            }
+                        }
                     },
                     "representante": {
                         "type": "array",
@@ -639,10 +657,29 @@
                                     "examples": ["Juan José"]
 								},
                                 "adjuntarPoderRepresentacion": {
-                                    "type": "string",
+                                    "type": "object",
                                     "default": false,
                                     "title": "Adjuntar poder de representación (URL)",
-                                    "examples": ["/DAES/poderRepresentacion.txt"]
+                                    "required": [
+                                        "url",
+                                        "nombreArchivo"
+                                    ],
+                                    "properties": {
+                                        "url": {
+                                            "type": "string",
+                                            "default": false,
+                                            "examples": [
+                                                "www.url.cl/id123"
+                                            ]
+                                        },
+                                        "nombreArchivo": {
+                                            "type": "string",
+                                            "default": false,
+                                            "examples": [
+                                                "archivo3.txt"
+                                            ]
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -744,46 +781,109 @@
             ],
             "properties": {
                 "escrituraPublicaConstitucion": {
-                    "type": "string",
+                    "type": "object",
                     "default": false,
                     "title": "Escritura publica de constitución",
-                    "examples": [
-                        "/DAES/escrituraPublicaConstitucion.txt"
-                    ]
+                    "required": [
+                        "url",
+                        "nombreArchivo"
+                    ],
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "default": false,
+                            "examples": [
+                                "www.url.cl/id123"
+                            ]
+                        },
+                        "nombreArchivo": {
+                            "type": "string",
+                            "default": false,
+                            "examples": [
+                                "archivo3.txt"
+                            ]
+                        }
+                    }
                 },
                 "inscripcionExtractoCBR": {
-                    "type": "string",
+                    "type": "object",
                     "default": false,
                     "title": "Inscripción extracto CBR",
-                    "examples": [
-                        "/DAES/inscripcionExtractoCBR.txt"
-                    ]
+                    "required": [
+                        "url",
+                        "nombreArchivo"
+                    ],
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "default": false,
+                            "examples": [
+                                "www.url.cl/id123"
+                            ]
+                        },
+                        "nombreArchivo": {
+                            "type": "string",
+                            "default": false,
+                            "examples": [
+                                "archivo3.txt"
+                            ]
+                        }
+                    }
                 },
                 "publicacionDiarioOficial": {
-                    "type": "string",
+                    "type": "object",
                     "default": false,
                     "title": "Publicación diario oficial",
-                    "examples": [
-                        "/DAES/publicacionDiarioOficial.txt"
-                    ]
+                    "required": [
+                        "url",
+                        "nombreArchivo"
+                    ],
+                    "properties": {
+                        "url": {
+                            "type": "string",
+                            "default": false,
+                            "examples": [
+                                "www.url.cl/id123"
+                            ]
+                        },
+                        "nombreArchivo": {
+                            "type": "string",
+                            "default": false,
+                            "examples": [
+                                "archivo3.txt"
+                            ]
+                        }
+                    }
                 },
                 "otrosDocumentos": {
                     "type": "array",
                     "default": false,
                     "title": "OTROS DOCUMENTOS",
                     "description": "Links con URLs de archivos adicionales adjuntos",
-                    "items": {
-                        "type": "string"
-                    },
-                    "minItems": 0,
                     "uniqueItems": true,
-                    "examples": [
-                        [
-                            "/DAES/archivo1.txt",
-                            "/DAES/archivo2.txt"
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "url",
+                            "nombreArchivo"
                         ],
-                        [ ]
-                    ]
+                        "properties": {
+                            "url": {
+                                "type": "string",
+                                "default": false,
+                                "examples": [
+                                    "www.url.cl/id123"
+                                ]
+                            },
+                            "nombreArchivo": {
+                                "type": "string",
+                                "default": false,
+                                "examples": [
+                                    "archivo3.txt"
+                                ]
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -1003,7 +1103,10 @@
                     "direccion": "San Ignacio 064 3 314 Villa Los Alerces",
                     "telefono": "5001001101",
                     "eMail": "admin@cooperativa.cl",
-                    "adjuntarDocumento" : "/DAES/archivo3.txt",
+                    "adjuntarDocumento": {
+                        "url": "www.url.cl/id123",
+                        "nombreArchivo": "archivo3.txt"
+                    },
                     "representante": [
                         {
                             "rut": 12345678,
@@ -1012,7 +1115,10 @@
                             "primerApellido": "González",
                             "segundoApellido": "Muñoz",
                             "nombres": "Juan José",
-                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                            "adjuntarPoderRepresentacion": {
+                                "url": "www.url.cl/id123",
+                                "nombreArchivo": "archivo3.txt"
+                            }
                         },
                         {
                             "rut": 12345679,
@@ -1021,7 +1127,10 @@
                             "primerApellido": "González",
                             "segundoApellido": "Muñoz",
                             "nombres": "Juan José",
-                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                            "adjuntarPoderRepresentacion": {
+                                "url": "www.url.cl/id123",
+                                "nombreArchivo": "archivo3.txt"
+                            }
                         }
                     ],
                     "calidad": [
@@ -1071,7 +1180,10 @@
                     "direccion": "San Ignacio 064 3 314 Villa Los Alerces",
                     "telefono": "5001001101",
                     "eMail": "admin@cooperativa.cl",
-                    "adjuntarDocumento" : "/DAES/archivo4.txt",
+                    "adjuntarDocumento" : {
+                        "url": "www.url.cl/id123",
+                        "nombreArchivo": "archivo3.txt"
+                    },
                     "representante": [
                         {
                             "rut": 12345678,
@@ -1080,7 +1192,10 @@
                             "primerApellido": "González",
                             "segundoApellido": "Muñoz",
                             "nombres": "Juan José",
-                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                            "adjuntarPoderRepresentacion": {
+                                "url": "www.url.cl/id123",
+                                "nombreArchivo": "archivo3.txt"
+                            }
                         },
                         {
                             "rut": 12345679,
@@ -1089,7 +1204,10 @@
                             "primerApellido": "González",
                             "segundoApellido": "Muñoz",
                             "nombres": "Juan José",
-                            "adjuntarPoderRepresentacion": "/DAES/poderRepresentacion.txt"
+                            "adjuntarPoderRepresentacion": {
+                                "url": "www.url.cl/id123",
+                                "nombreArchivo": "archivo3.txt"
+                            }
                         }
                     ],
                     "calidad": [
@@ -1123,10 +1241,27 @@
                 }
             ],
             "documentos": {
-                "escrituraPublicaConstitucion": "/DAES/escrituraPublicaConstitucion.txt",
-                "inscripcionExtractoCBR": "/DAES/inscripcionExtractoCBR.txt",
-                "publicacionDiarioOficial": "/DAES/publicacionDiarioOficial.txt",
-                "otrosDocumentos": ["/DAES/archivo1.txt","/DAES/archivo2.txt"]
+                "escrituraPublicaConstitucion": {
+                    "url": "www.url.cl/id123",
+                    "nombreArchivo": "archivo3.txt"
+                },
+                "inscripcionExtractoCBR": {
+                    "url": "www.url.cl/id123",
+                    "nombreArchivo": "archivo3.txt"
+                },
+                "publicacionDiarioOficial": {
+                    "url": "www.url.cl/id123",
+                    "nombreArchivo": "archivo3.txt"
+                },
+                "otrosDocumentos": [
+                    {
+                        "url": "www.url.cl/id123",
+                        "nombreArchivo": "archivo3.txt"
+                    },
+                    {
+                        "url": "www.url.cl/id124",
+                        "nombreArchivo": "archivo4.txt"
+                    }]
             },
             "datosDelSistema": {
                 "numeroDeAtencion": 100,

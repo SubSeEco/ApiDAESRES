@@ -22,8 +22,8 @@ namespace DAES.API.BackOffice.Modelos
         public DbSet<Workflow> Workflows { get; set; }
         public DbSet<DefinicionProceso> DefinicionProcesos { get; set; }
         public DbSet<DefinicionWorkflow> DefinicionWorkflows { get; set; }
-
         public DbSet<AspNetUsers> NetUsers { get; set; }
+        public DbSet<Rol> Roles { get; set; }
 
         // Otro código de configuración de DbContext
     }

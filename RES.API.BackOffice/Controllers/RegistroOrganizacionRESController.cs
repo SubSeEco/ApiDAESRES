@@ -7,7 +7,8 @@ using RES.API.BackOffice;
 using DAES.API.BackOffice.Modelos;
 using Microsoft.EntityFrameworkCore;
 using Enum = DAES.API.BackOffice.Modelos.Enum;
-using RES.API.BackOffice.Modelos;
+using Microsoft.AspNetCore.Mvc.Filters;
+
 
 namespace App.API.Controllers
 {
@@ -29,6 +30,7 @@ namespace App.API.Controllers
         [HttpPost]
         [Consumes("application/json")]
         [Produces("application/json")]
+        [ServiceFilter(typeof(PostMethodFilter))]
         public async Task<IActionResult> Post([FromBody] JsonDocument jsonDocument)
         {
             try
@@ -39,9 +41,15 @@ namespace App.API.Controllers
                 var validation = validator.Validate(jsonDocument.RootElement.ToString(), schema);
                 if (validation.Count != 0) { return BadRequest("json invalido"); }
                 MensajeOrganizacionRES mensajeOrganizacionesRES = jsonDocument.Deserialize<MensajeOrganizacionRES>();
+
+                Rol rol = new Rol();
+                _dbContext.Roles.Add(rol);
+                _dbContext.SaveChanges();
+
                 Organizacion organizacion = new Organizacion
                 {
                     TipoOrganizacionId = (int)Enum.TipoOrganizacion.Cooperativa,
+                    NumeroRegistro = rol.RolId.ToString(),
                     SituacionId = (int)Enum.Situacion.Inactiva,
                     RubroId = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
                     SubRubroId = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
@@ -136,7 +144,8 @@ namespace App.API.Controllers
                     FechaCreacion = now,
                     FechaVencimiento = FechaTermino,
                     Terminada = false,
-                    Creador = "ApiRes"
+                    Creador = "ApiRes",
+                    Observacion = "Documentos por subir - pendiente"
                 };
                 _dbContext.Procesos.Add(proceso);
                 _dbContext.SaveChanges();
@@ -179,8 +188,9 @@ namespace App.API.Controllers
                 List<Documento> documentos = new List<Documento>();
                 documentos.Add(new Documento()
                 {
-                    Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial,
-                    Activo = true,
+                    FileName = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.NombreArchivo,
+                    Url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.URL,
+                    Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
@@ -192,8 +202,9 @@ namespace App.API.Controllers
                 });
                 documentos.Add(new Documento()
                 {
-                    Url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR,
-                    Activo = true,
+                    Url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.URL,
+                    FileName = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.NombreArchivo,
+                    Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
@@ -205,8 +216,9 @@ namespace App.API.Controllers
                 });
                 documentos.Add(new Documento()
                 {
-                    Url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion,
-                    Activo = true,
+                    Url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.URL,
+                    FileName = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.NombreArchivo,
+                    Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
                     WorkflowId = workflow.WorkflowId,
@@ -216,12 +228,13 @@ namespace App.API.Controllers
                     Enviado = false,
                     //TipoDocumentoCodigo = 
                 });
-                foreach (string otroDocumento in mensajeOrganizacionesRES.Documentos.OtrosDocumentos)
+                foreach (ModulosRES.Documento otroDocumento in mensajeOrganizacionesRES.Documentos.OtrosDocumentos)
                 {
                     documentos.Add(new Documento()
                     {
-                        Url = otroDocumento,
-                        Activo = true,
+                        Url = otroDocumento.URL,
+                        FileName = otroDocumento.NombreArchivo,
+                        Activo = false,
                         OrganizacionId = organizacion.OrganizacionId,//
                         ProcesoId = proceso.ProcesoId,
                         WorkflowId = workflow.WorkflowId,
@@ -235,13 +248,86 @@ namespace App.API.Controllers
                     _dbContext.Documentos.Add(documento);
                 }
                 _dbContext.SaveChanges();
-                
-                return Ok($"{{\"ProcesoId\": {proceso.ProcesoId}}}");
+
+                var resultData = new { Message = "La organización ha sido registrada exitosamente", ReceivedData = mensajeOrganizacionesRES };
+                HttpContext.Items["ProcesoId"] = proceso.ProcesoId;
+
+                return Ok(resultData);
             }
             catch (DbUpdateException ex)
             {
                 string entries = "[" + string.Join(", ", ex.Entries) + "]";
                 return BadRequest($"{{\"message\": \"error en actualizar sistema integrado\", \"entries\": \"{entries}\"}}");
+            }
+        }
+
+        // Action filter for POST method
+        public class PostMethodFilter : IAsyncActionFilter
+        {
+            private readonly MyDbContext _dbContext;
+
+            public PostMethodFilter(MyDbContext dbContext)
+            {
+                _dbContext = dbContext;
+            }
+            public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+            {
+                // Continue to the action method
+                var resultContext = await next();
+                // Confirmar que la organización haya sido registrada exitosamente
+                if (context.HttpContext.Response.StatusCode == 200)
+                {
+                    if (context.HttpContext.Items.TryGetValue("ProcesoId", out var ProcesoIdObject) && ProcesoIdObject is int ProcesoId)
+                    {
+                        Proceso proceso = _dbContext.Procesos.FirstOrDefault(p => p.ProcesoId == ProcesoId);
+                        proceso.Observacion = "Documentos por subir - en proceso";
+                        _dbContext.Procesos.Update(proceso);
+                        _dbContext.SaveChanges();
+
+                        IQueryable<Documento> documentos = _dbContext.Documentos.Where(p => p.ProcesoId == ProcesoId);
+                        //
+                        int numeroDocumentosFallidos = 0;
+                        foreach (Documento documento in documentos)
+                        {
+                            try
+                            {
+                                string urlArchivo = documento.Url;
+                                byte[] archivoBytes = DescargarArchivo(urlArchivo);
+                                documento.Content = archivoBytes;
+                                documento.Activo = true;
+                                _dbContext.Documentos.Update(documento);
+                            }
+                            catch (Exception ex)
+                            {
+                                numeroDocumentosFallidos++;
+                            }
+                        }
+                        if (numeroDocumentosFallidos == documentos.Count())
+                        {
+                            proceso.Observacion = $"\"fallo la subida de todos los {numeroDocumentosFallidos} documentos";
+                        }
+                        else if (numeroDocumentosFallidos == 0)
+                        {
+                            proceso.Observacion = null;
+                        }
+                        else
+                        {
+                            proceso.Observacion = $"fallo la subida de {numeroDocumentosFallidos} documentos de un total de {documentos.Count()}";
+                        }
+                        _dbContext.Procesos.Update(proceso);
+                        
+                        _dbContext.SaveChanges();
+                    }
+                }
+
+            }
+
+            private byte[] DescargarArchivo(string url)
+            {
+                using (System.Net.WebClient client = new System.Net.WebClient())
+                {
+                    return client.DownloadData(url);
+                }
             }
         }
     }
