@@ -42,6 +42,71 @@ namespace App.API.Controllers
                 if (validation.Count != 0) { return BadRequest("json invalido"); }
                 MensajeOrganizacionRES mensajeOrganizacionesRES = jsonDocument.Deserialize<MensajeOrganizacionRES>();
 
+
+                //validamos los codigos (llaves foraneas de tablas DAES) enviadas en el mensaje RES
+                bool ValidacionCodigos = true;
+                List<string> errors = new List<string>();
+
+                //subrubro-rubro
+                IQueryable<DiccionarioSubRubro> diccionarioSubRubros = _dbContext.DiccionarioSubRubros.Where(s => s.CodigoRES == mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico);
+                if (!diccionarioSubRubros.Any())
+                {
+                    ValidacionCodigos = false;
+                    errors.Add($"Codigo RES SubRubro {mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico} (codigo RES: {}) no se encuentra en el diccionario");
+                }
+
+                IQueryable<DiccionarioRubro> diccionarioRubros = _dbContext.DiccionarioRubros.Where(s => s.CodigoRES == mensajeOrganizacionesRES.ObjetoSocial.Rubro);
+                if (!diccionarioRubros.Any())
+                {
+                    ValidacionCodigos = false;
+                    errors.Add($"Codigo RES Rubro {mensajeOrganizacionesRES.ObjetoSocial.Rubro} (codigo RES: {}) no se encuentra en el diccionario");
+                }
+
+                if (diccionarioRubros.Any() && diccionarioSubRubros.Any())
+                {
+                    IQueryable<SubRubro> SubRubro_RubroId = _dbContext.SubRubros.Where(s => s.SubRubroId == diccionarioSubRubros.FirstOrDefault().SubRubroId &&
+                                                                    s.RubroId == diccionarioRubros.FirstOrDefault().RubroId);
+                    if (!SubRubro_RubroId.Any())
+                    {
+                        ValidacionCodigos = false;
+                        errors.Add($"Combinacion codigos SubRubroId {diccionarioSubRubros.FirstOrDefault().SubRubroId} y RubroId {diccionarioRubros.FirstOrDefault().RubroId} no se encuentra en tabla SubRubros " +
+                                   $"(codigos RES correspondientes: {mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico} y {mensajeOrganizacionesRES.ObjetoSocial.Rubro})");
+                    }
+                }
+
+                //comuna-region
+                IQueryable<DiccionarioComuna> diccionarioComunas = _dbContext.DiccionarioComunas.Where(s => s.CodigoRES == mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna);
+                if (!diccionarioComunas.Any())
+                {
+                    ValidacionCodigos = false;
+                    errors.Add($"Codigo RES Comuna {mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna} no se encuentra en el diccionario");
+                }
+
+                IQueryable<DiccionarioRegion> diccionarioRegiones = _dbContext.DiccionarioRegiones.Where(s => s.CodigoRES == mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region);
+                if (!diccionarioRegiones.Any())
+                {
+                    ValidacionCodigos = false;
+                    errors.Add($"Codigo RES Region {mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region} no se encuentra en el diccionario");
+                }
+
+                if (diccionarioRegiones.Any() && diccionarioComunas.Any())
+                {
+                    IQueryable<Comuna> Comunas_RegionId = _dbContext.Comunas.Where(s => s.ComunaId == diccionarioComunas.FirstOrDefault().ComunaId &&
+                                                                                        s.RegionId == diccionarioRegiones.FirstOrDefault().RegionId);
+                    if (!Comunas_RegionId.Any())
+                    {
+                        ValidacionCodigos = false;
+                        errors.Add($"Combinacion codigos ComunaId {diccionarioComunas.FirstOrDefault().ComunaId} y RegionId {diccionarioRegiones.FirstOrDefault().RegionId} no se encuentra en tabla Comunas " +
+                                   $"(codigos RES correspondientes: {mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna} y {mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region})");
+                    }
+                }
+
+
+                if (!ValidacionCodigos) {
+                    return BadRequest(new { Message = "errores: "+string.Join(", ", errors) });
+                }
+
+
                 Rol rol = new Rol();
                 _dbContext.Roles.Add(rol);
                 _dbContext.SaveChanges();
@@ -51,12 +116,12 @@ namespace App.API.Controllers
                     TipoOrganizacionId = (int)Enum.TipoOrganizacion.Cooperativa,
                     NumeroRegistro = rol.RolId.ToString(),
                     SituacionId = (int)Enum.Situacion.Inactiva,
-                    RubroId = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
-                    SubRubroId = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
+                    RubroId = diccionarioRubros.FirstOrDefault().RubroId,
+                    SubRubroId = diccionarioSubRubros.FirstOrDefault().SubRubroId,
                     RazonSocial = mensajeOrganizacionesRES.NombreCooperativa.RazonSocial,
                     Sigla = mensajeOrganizacionesRES.NombreCooperativa.NombreFantasiaOSigla,
-                    RegionId = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region,
-                    ComunaId = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna,
+                    RegionId = diccionarioRegiones.FirstOrDefault().RegionId,
+                    ComunaId = diccionarioComunas.FirstOrDefault().ComunaId,
                     Direccion = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Direccion,
                     Email = mensajeOrganizacionesRES.ContactoDeLaCooperativa.EMail,
                     Fono = mensajeOrganizacionesRES.ContactoDeLaCooperativa.Telefono,

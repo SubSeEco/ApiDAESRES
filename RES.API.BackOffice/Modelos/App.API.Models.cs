@@ -24,6 +24,14 @@ namespace DAES.API.BackOffice.Modelos
         public DbSet<DefinicionWorkflow> DefinicionWorkflows { get; set; }
         public DbSet<AspNetUsers> NetUsers { get; set; }
         public DbSet<Rol> Roles { get; set; }
+        public DbSet<Rubro> Rubros { get; set; }
+        public DbSet<SubRubro> SubRubros { get; set; }
+        public DbSet<Region> Regiones { get; set; }
+        public DbSet<Comuna> Comunas { get; set; }
+        public DbSet<DiccionarioRubro> DiccionarioRubros { get; set; }
+        public DbSet<DiccionarioSubRubro> DiccionarioSubRubros { get; set; }
+        public DbSet<DiccionarioRegion> DiccionarioRegiones { get; set; }
+        public DbSet<DiccionarioComuna> DiccionarioComunas { get; set; }
 
         // Otro código de configuración de DbContext
     }
