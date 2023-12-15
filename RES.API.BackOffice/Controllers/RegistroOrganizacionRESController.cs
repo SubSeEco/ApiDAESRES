@@ -52,14 +52,14 @@ namespace App.API.Controllers
                 if (!diccionarioSubRubros.Any())
                 {
                     ValidacionCodigos = false;
-                    errors.Add($"Codigo RES SubRubro {mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico} (codigo RES: {}) no se encuentra en el diccionario");
+                    errors.Add($"Codigo RES SubRubro {mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico} no se encuentra en el diccionario");
                 }
 
                 IQueryable<DiccionarioRubro> diccionarioRubros = _dbContext.DiccionarioRubros.Where(s => s.CodigoRES == mensajeOrganizacionesRES.ObjetoSocial.Rubro);
                 if (!diccionarioRubros.Any())
                 {
                     ValidacionCodigos = false;
-                    errors.Add($"Codigo RES Rubro {mensajeOrganizacionesRES.ObjetoSocial.Rubro} (codigo RES: {}) no se encuentra en el diccionario");
+                    errors.Add($"Codigo RES Rubro {mensajeOrganizacionesRES.ObjetoSocial.Rubro} no se encuentra en el diccionario");
                 }
 
                 if (diccionarioRubros.Any() && diccionarioSubRubros.Any())
