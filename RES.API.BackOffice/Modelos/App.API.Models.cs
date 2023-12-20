@@ -32,6 +32,12 @@ namespace DAES.API.BackOffice.Modelos
         public DbSet<DiccionarioSubRubro> DiccionarioSubRubros { get; set; }
         public DbSet<DiccionarioRegion> DiccionarioRegiones { get; set; }
         public DbSet<DiccionarioComuna> DiccionarioComunas { get; set; }
+        public DbSet<RESCrearOrgMensaje> RESCrearOrgMensajes { get; set; }
+        public DbSet<RESCrearOrgobjetoSocial_actividades> RESCrearOrgObjetoSocial_actividades { get; set; }
+        public DbSet<RESCrearOrgCooperadosYAdministradores> RESCrearOrgCooperadosYAdministradores { get; set; }
+        public DbSet<RESCrearOrgCapitalDelSocio> RESCrearOrgCapitalDelSocios { get; set; }
+        public DbSet<RESCrearOrgRepresentante> RESCrearOrgRepresentantes { get; set; }
+        public DbSet<RESCrearOrgCalidad> RESCrearOrgCalidades { get; set; }
 
         // Otro código de configuración de DbContext
     }
