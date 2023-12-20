@@ -25,8 +25,6 @@ namespace DAES.API.BackOffice.Modelos
 
         [Display(Name = "SubRubro Especifico")]
         public int objetoSocial_subRubroEspecifico { get; set; }
-        [Display(Name = "Actividades")]
-        public int objetoSocial_actividades { get; set; }
         [Display(Name = "Razon Social")]
         public string nombreCooperativa_razonSocial { get; set; }
         [Display(Name = "Nombre Fantasia o Sigla")]
