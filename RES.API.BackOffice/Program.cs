@@ -36,14 +36,15 @@ var cache = app.Services.GetRequiredService<IMemoryCache>();
 cache.Set("MensajeOrganizacionRES", mensajeOrganizacionRESSchema);
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
+// solicitado para que swagger UI quede disponible al ser dockerizado, se comenta la condicion de ambiente de desarrollo
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "API DAES RES V1");
     });
-}
+//}
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
