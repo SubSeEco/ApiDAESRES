@@ -3,24 +3,23 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAES.API.BackOffice.Modelos
 {
-    
+
     [Table("RESCrearOrgCalidad")]
     public class RESCrearOrgCalidad
     {
         public RESCrearOrgCalidad()
         {
-               
+
         }
 
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         [Display(Name = "Id")]
-        public int RESCrearOrgMensajeId { get; set; }
+        public int RESCrearOrgCalidadId { get; set; }
+        [Display(Name = "RESCrearOrgCooperadosYAdministradoresId")]
+        public int RESCrearOrgCooperadosYAdministradoresId { get; set; }
+        [Display(Name = "Calidad")]
+        public int Calidad { get; set; }
 
-        [Display(Name = "Proceso Id")]
-        public int ProcesoId { get; set; }
-
-        [Display(Name = "Rubro Coooperativa")]
-        public int objetoSocial_rubro { get; set; }
     }
-}
+    }

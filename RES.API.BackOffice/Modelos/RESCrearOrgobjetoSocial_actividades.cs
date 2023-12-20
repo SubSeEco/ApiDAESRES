@@ -16,11 +16,9 @@ namespace DAES.API.BackOffice.Modelos
         [Key]
         [Display(Name = "Id")]
         public int RESCrearOrgobjetoSocial_actividadesId { get; set; }
-
-        [Display(Name = "Proceso Id")]
-        public int ProcesoId { get; set; }
-
-        [Display(Name = "Rubro Coooperativa")]
-        public int objetoSocial_rubro { get; set; }
+        [Display(Name = "RESCrearOrgMensajeId")]
+        public int RESCrearOrgMensajeId { get; set; }
+        [Display(Name = "actividad")]
+        public int actividad { get; set; }
     }
 }
