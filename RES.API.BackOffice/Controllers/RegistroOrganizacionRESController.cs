@@ -316,7 +316,7 @@ namespace App.API.Controllers
                 }
                 _dbContext.SaveChanges();
 
-                var resultData = new { Message = "La organización ha sido registrada exitosamente", ReceivedData = mensajeOrganizacionesRES };
+                var resultData = new { Message = "La organización ha sido registrada exitosamente", ProcesoId = proceso.ProcesoId, ReceivedData = mensajeOrganizacionesRES };
                 HttpContext.Items["ProcesoId"] = proceso.ProcesoId;
                 HttpContext.Items["mensajeOrganizacionesRES"] = mensajeOrganizacionesRES;
 
