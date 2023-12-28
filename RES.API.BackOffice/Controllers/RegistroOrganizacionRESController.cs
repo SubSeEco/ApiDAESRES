@@ -41,12 +41,130 @@ namespace App.API.Controllers
                 var schema = JsonSchema.FromJsonAsync(organizacionRESSchema).Result;
                 var validator = new JsonSchemaValidator();
                 var validation = validator.Validate(jsonDocument.RootElement.ToString(), schema);
-                if (validation.Count != 0) { return BadRequest("json invalido"); }
+                if (validation.Count != 0) { return BadRequest(new { Message = "json invalido" }); }
                 MensajeOrganizacionRES mensajeOrganizacionesRES = jsonDocument.Deserialize<MensajeOrganizacionRES>();
 
 
-                //validamos los codigos (llaves foraneas de tablas DAES) enviadas en el mensaje RES
-                bool ValidacionCodigos = true;
+                //validamos que no se este re-procesando un mismo registro (caso de multiples envios de Solicitud desde RES)
+                IQueryable<RESCrearOrgMensaje> MensajesAtencion = _dbContext.RESCrearOrgMensajes.Where(s => s.datosDelSistema_numeroDeAtencion == mensajeOrganizacionesRES.DatosDelSistema.NumeroDeAtencion);
+                if (MensajesAtencion.Any())
+                {
+                    RESCrearOrgMensaje MensajeRepetido = MensajesAtencion.FirstOrDefault();
+
+                    List<int> StoredActividades = new List<int>();
+                    List<CooperadoYAdministrador> StoredCoopYAdms = new List<CooperadoYAdministrador>();
+                    List<Calidad> StoredCalidades;
+                    List<CapitalDelSocio> StoredCapitales;
+                    List<Representante> StoredRepresentantes;
+                    IQueryable<RESCrearOrgobjetoSocial_actividades> repActividades  = _dbContext.RESCrearOrgObjetoSocial_actividades.Where(s => s.RESCrearOrgMensajeId == MensajeRepetido.RESCrearOrgMensajeId);
+                    foreach (RESCrearOrgobjetoSocial_actividades repAct in repActividades)
+                    {
+                        StoredActividades.Add(repAct.actividad);
+                    }
+                    IQueryable<RESCrearOrgCooperadosYAdministradores> repCoopYAdms = _dbContext.RESCrearOrgCooperadosYAdministradores.Where(s => s.RESCrearOrgMensajeId == MensajeRepetido.RESCrearOrgMensajeId);
+                    foreach (RESCrearOrgCooperadosYAdministradores repCYA in repCoopYAdms)
+                    {
+                        StoredCalidades = new List<Calidad>();
+                        StoredCapitales = new List<CapitalDelSocio>();
+                        StoredRepresentantes = new List<Representante>();
+                        IQueryable<RESCrearOrgCalidad> repCalidades = _dbContext.RESCrearOrgCalidades.Where(s => s.RESCrearOrgCooperadosYAdministradoresId == repCYA.RESCrearOrgCooperadosYAdministradoresId);
+                        foreach (RESCrearOrgCalidad repCal in repCalidades)
+                        {
+                            StoredCalidades.Add(new Calidad()
+                            {
+                                TipoCalidades = repCal.Calidad
+                            });
+                        }
+                        IQueryable<RESCrearOrgCapitalDelSocio> repCapitales = _dbContext.RESCrearOrgCapitalDelSocios.Where(s => s.RESCrearOrgCooperadosYAdministradoresId == repCYA.RESCrearOrgCooperadosYAdministradoresId);
+                        foreach (RESCrearOrgCapitalDelSocio repCap in repCapitales)
+                        {
+                            StoredCapitales.Add(new CapitalDelSocio()
+                            {
+                                TiposAporte = repCap.tiposAporte,
+                                CantidadCuotas = repCap.cantidadCuotas,
+                                CapitalPagado = repCap.capitalPagado,
+                                CapitalPorPagar = repCap.capitalPorPagar,
+                                PlazoParaPagar = repCap.plazoParaPagar,
+                                FormaEnQueSeraEnterado = repCap.formaEnQueSeraEnterado,
+                                DescripcionAporte = repCap.descripcionAporte
+                            });
+                        }
+                        IQueryable<RESCrearOrgRepresentante> repRepresentantes = _dbContext.RESCrearOrgRepresentantes.Where(s => s.RESCrearOrgCooperadosYAdministradoresId == repCYA.RESCrearOrgCooperadosYAdministradoresId);
+                        foreach (RESCrearOrgRepresentante repRep in repRepresentantes)
+                        {
+                            StoredRepresentantes.Add(new Representante()
+                            {
+                                Rut = repRep.rut,
+                                Dv = repRep.dv,
+                                RutDV = repRep.rutDV,
+                                PrimerApellido = repRep.primerApellido,
+                                SegundoApellido = repRep.segundoApellido,
+                                Nombres = repRep.nombres
+                            });
+                        }
+                        StoredCoopYAdms.Add(new CooperadoYAdministrador()
+                        {
+                            Rut = repCYA.rut,
+                            DV = repCYA.dv,
+                            RutDV = repCYA.rutDV,
+                            PrimerApellido = repCYA.primerApellido,
+                            SegundoApellido = repCYA.segundoApellido,
+                            Nombres = repCYA.nombres,
+                            RazonSocial = repCYA.razonSocial,
+                            Calle = repCYA.calle,
+                            Numero = repCYA.numero,
+                            Bloque = repCYA.bloque,
+                            Departamento = repCYA.departamento,
+                            VillaPoblacion = repCYA.villaPoblacion,
+                            Region = repCYA.region,
+                            Comuna = repCYA.comuna,
+                            Direccion = repCYA.direccion,
+                            Telefono = repCYA.telefono,
+                            EMail = repCYA.eMail,
+                            AdjuntarDocumento = new ModulosRES.Documento() { NombreArchivo = repCYA.adjuntarDocumento_nombreArchivo, URL = repCYA.adjuntarDocumento_url},
+                            Representante = StoredRepresentantes,
+                            Calidad = StoredCalidades,
+                            CapitalDelSocio = StoredCapitales
+                        });
+                    }
+
+                    List<ModulosRES.Documento> repOtrosDocs = new List<ModulosRES.Documento>();
+
+                    ModulosRES.Documentos StoredDocumentos = new ModulosRES.Documentos()
+                    {
+                        EscrituraPublicaConstitucion = new ModulosRES.Documento() { NombreArchivo = MensajeRepetido.documentos_escrituraPublicaConstitucion_nombreArchivo,  URL = MensajeRepetido.documentos_escrituraPublicaConstitucion_url },
+                        InscripcionExtractoCBR = new ModulosRES.Documento() { NombreArchivo = MensajeRepetido.documentos_inscripcionExtractoCBR_nombreArchivo, URL = MensajeRepetido.documentos_inscripcionExtractoCBR_url },
+                        PublicacionDiarioOficial = new ModulosRES.Documento() { NombreArchivo = MensajeRepetido.documentos_publicacionDiarioOficial_nombreArchivo, URL = MensajeRepetido.documentos_publicacionDiarioOficial_url },
+                        OtrosDocumentos = repOtrosDocs
+                    };
+
+                    return Conflict(new { Message = $"Solicitud de registro de organización repetida (numero de atención de mensaje RES ya existe)", numeroDeAtencion = MensajeRepetido.datosDelSistema_numeroDeAtencion, ProcesoId = MensajeRepetido.ProcesoId, ReceivedData = mensajeOrganizacionesRES
+                    , StoredData = new MensajeOrganizacionRES()
+                    {
+                        ObjetoSocial = new ObjetoSocial() { Rubro=MensajeRepetido.objetoSocial_rubro,SubRubroEspecifico= MensajeRepetido.objetoSocial_subRubroEspecifico, Actividades = StoredActividades },
+                        NombreCooperativa = new NombreCooperativa() { RazonSocial = MensajeRepetido.nombreCooperativa_razonSocial, NombreFantasiaOSigla = MensajeRepetido.nombreCooperativa_nombreFantasiaOSigla },
+                        DireccionDeLaCooperativa = new DireccionDeLaCooperativa() { Calle = MensajeRepetido.direccionDeLaCooperativa_calle, Numero = MensajeRepetido.direccionDeLaCooperativa_numero, Bloque = MensajeRepetido.direccionDeLaCooperativa_bloque, Departamento = MensajeRepetido.direccionDeLaCooperativa_departamento
+                        , VillaPoblacion = MensajeRepetido.direccionDeLaCooperativa_villaPoblacion, Region = MensajeRepetido.direccionDeLaCooperativa_region, Comuna = MensajeRepetido.direccionDeLaCooperativa_comuna, Direccion = MensajeRepetido.direccionDeLaCooperativa_direccion },
+                        ContactoDeLaCooperativa = new ContactoDeLaCooperativa() { EMail = MensajeRepetido.contactoDeLaCooperativa_eMail, Telefono = MensajeRepetido.contactoDeLaCooperativa_telefono, PaginaWeb = MensajeRepetido.contactoDeLaCooperativa_paginaWeb },
+                        CapitalDeLaCooperativa = new CapitalDeLaCooperativa() { MontoTotalCapitalInicial = MensajeRepetido.capitalDeLaCooperativa_montoTotalCapitalInicial, NumeroCuotasParticipacion = MensajeRepetido.capitalDeLaCooperativa_numeroCuotasParticipacion, ValorCuotasPaticipacion = MensajeRepetido.capitalDeLaCooperativa_valorCuotasPaticipacion },
+                        DuracionDeLaCooperativa = new DuracionDeLaCooperativa() { Indefinido = MensajeRepetido.duracionDeLaCooperativa_indefinido, Anhos = MensajeRepetido.duracionDeLaCooperativa_anhos },
+                        AdministracionDeLaCooperativa = new AdministracionDeLaCooperativa() { TipoAdministracion = MensajeRepetido.administracionDeLaCooperativa_tipoAdministracion },
+                        ConsejoAdministracion = new ConsejoAdministracion() { NumeroMiembros = MensajeRepetido.consejoAdministracion_numeroMiembros, PlazoDuracion = MensajeRepetido.consejoAdministracion_plazoDuracion, DerechoReeleccion = MensajeRepetido.consejoAdministracion_derechoReeleccion },
+                        JuntaDeVigilancia = new JuntaDeVigilancia() { NumeroMiembros = MensajeRepetido.juntaDeVigilancia_numeroMiembros, PlazoDuracion = MensajeRepetido.juntaDeVigilancia_plazoDuracion, DerechoReeleccion = MensajeRepetido.juntaDeVigilancia_derechoReeleccion },
+                        DerechosYObligacionesSocios = new DerechosYObligacionesSocios() { AporteParaIngresoACooperativa = MensajeRepetido.derechosYObligacionesSocios_aporteParaIngresoACooperativa },
+                        OtrosAcuerdos = new OtrosAcuerdos() { Inclusiva = MensajeRepetido.otrosAcuerdos_inclusiva, ExclusivaMujeres = MensajeRepetido.otrosAcuerdos_exclusivaMujeres, CalidadIndigena = MensajeRepetido.otrosAcuerdos_calidadIndigena },
+                        CooperadosYAdministradores = StoredCoopYAdms,
+                        Documentos = StoredDocumentos,
+                        DatosDelSistema = new DatosDelSistema() { NumeroDeAtencion = MensajeRepetido.datosDelSistema_numeroDeAtencion, NumeroTotalSocios = MensajeRepetido.datosDelSistema_numeroTotalSocios, NumeroSociosHombres = MensajeRepetido.datosDelSistema_numeroSociosHombres, NumeroSociasMujeres = MensajeRepetido.datosDelSistema_numeroSociasMujeres
+                        , RutSolicitante = MensajeRepetido.datosDelSistema_rutSolicitante, Dv = MensajeRepetido.datosDelSistema_dv, RutDV = MensajeRepetido.datosDelSistema_rutDV, NombresSolicitante = MensajeRepetido.datosDelSistema_nombresSolicitante, PrimerApellido = MensajeRepetido.datosDelSistema_primerApellido
+                        , SegundoApellido = MensajeRepetido.datosDelSistema_segundoApellido, EmailSolicitante = MensajeRepetido.datosDelSistema_emailSolicitante, FonoSolicitante = MensajeRepetido.datosDelSistema_fonoSolicitante, FechaCelebracion = MensajeRepetido.datosDelSistema_fechaCelebracion }
+                    }
+                    });
+                }
+
+
+                    //validamos los codigos (llaves foraneas de tablas DAES) enviadas en el mensaje RES
+                    bool ValidacionCodigos = true;
                 List<string> errors = new List<string>();
 
                 //subrubro-rubro
@@ -107,8 +225,159 @@ namespace App.API.Controllers
                 if (!ValidacionCodigos) {
                     return BadRequest(new { Message = "errores: "+string.Join(", ", errors) });
                 }
-                
 
+                //guardamos mensaje RES en backoffice
+                RESCrearOrgMensaje RESMensaje = new RESCrearOrgMensaje()
+                {
+                    objetoSocial_rubro = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
+                    objetoSocial_subRubroEspecifico = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
+                    nombreCooperativa_razonSocial = mensajeOrganizacionesRES.NombreCooperativa.RazonSocial,
+                    nombreCooperativa_nombreFantasiaOSigla = mensajeOrganizacionesRES.NombreCooperativa.NombreFantasiaOSigla,
+                    direccionDeLaCooperativa_calle = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Calle,
+                    direccionDeLaCooperativa_numero = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Numero,
+                    direccionDeLaCooperativa_bloque = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Bloque,
+                    direccionDeLaCooperativa_departamento = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Departamento,
+                    direccionDeLaCooperativa_villaPoblacion = mensajeOrganizacionesRES.DireccionDeLaCooperativa.VillaPoblacion,
+                    direccionDeLaCooperativa_region = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region,
+                    direccionDeLaCooperativa_comuna = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna,
+                    direccionDeLaCooperativa_direccion = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Direccion,
+                    contactoDeLaCooperativa_eMail = mensajeOrganizacionesRES.ContactoDeLaCooperativa.EMail,
+                    contactoDeLaCooperativa_telefono = mensajeOrganizacionesRES.ContactoDeLaCooperativa.Telefono,
+                    contactoDeLaCooperativa_paginaWeb = mensajeOrganizacionesRES.ContactoDeLaCooperativa.PaginaWeb,
+                    capitalDeLaCooperativa_montoTotalCapitalInicial = mensajeOrganizacionesRES.CapitalDeLaCooperativa.MontoTotalCapitalInicial,
+                    capitalDeLaCooperativa_numeroCuotasParticipacion = mensajeOrganizacionesRES.CapitalDeLaCooperativa.NumeroCuotasParticipacion,
+                    capitalDeLaCooperativa_valorCuotasPaticipacion = mensajeOrganizacionesRES.CapitalDeLaCooperativa.ValorCuotasPaticipacion,
+                    duracionDeLaCooperativa_indefinido = mensajeOrganizacionesRES.DuracionDeLaCooperativa.Indefinido,
+                    duracionDeLaCooperativa_anhos = mensajeOrganizacionesRES.DuracionDeLaCooperativa.Anhos,
+                    administracionDeLaCooperativa_tipoAdministracion = mensajeOrganizacionesRES.AdministracionDeLaCooperativa.TipoAdministracion,
+                    consejoAdministracion_numeroMiembros = mensajeOrganizacionesRES.ConsejoAdministracion.NumeroMiembros,
+                    consejoAdministracion_plazoDuracion = mensajeOrganizacionesRES.ConsejoAdministracion.PlazoDuracion,
+                    consejoAdministracion_derechoReeleccion = mensajeOrganizacionesRES.ConsejoAdministracion.DerechoReeleccion,
+                    juntaDeVigilancia_numeroMiembros = mensajeOrganizacionesRES.JuntaDeVigilancia.NumeroMiembros,
+                    juntaDeVigilancia_plazoDuracion = mensajeOrganizacionesRES.JuntaDeVigilancia.PlazoDuracion,
+                    juntaDeVigilancia_derechoReeleccion = mensajeOrganizacionesRES.JuntaDeVigilancia.DerechoReeleccion,
+                    derechosYObligacionesSocios_aporteParaIngresoACooperativa = mensajeOrganizacionesRES.DerechosYObligacionesSocios.AporteParaIngresoACooperativa,
+                    otrosAcuerdos_inclusiva = mensajeOrganizacionesRES.OtrosAcuerdos.Inclusiva,
+                    otrosAcuerdos_exclusivaMujeres = mensajeOrganizacionesRES.OtrosAcuerdos.ExclusivaMujeres,
+                    otrosAcuerdos_calidadIndigena = mensajeOrganizacionesRES.OtrosAcuerdos.CalidadIndigena,
+                    documentos_escrituraPublicaConstitucion_url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.URL,
+                    documentos_escrituraPublicaConstitucion_nombreArchivo = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.NombreArchivo,
+                    documentos_inscripcionExtractoCBR_url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.URL,
+                    documentos_inscripcionExtractoCBR_nombreArchivo = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.NombreArchivo,
+                    documentos_publicacionDiarioOficial_url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.URL,
+                    documentos_publicacionDiarioOficial_nombreArchivo = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.NombreArchivo,
+                    datosDelSistema_numeroDeAtencion = mensajeOrganizacionesRES.DatosDelSistema.NumeroDeAtencion,
+                    datosDelSistema_numeroTotalSocios = mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios,
+                    datosDelSistema_numeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
+                    datosDelSistema_numeroSociasMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
+                    datosDelSistema_rutSolicitante = mensajeOrganizacionesRES.DatosDelSistema.RutSolicitante,
+                    datosDelSistema_dv = mensajeOrganizacionesRES.DatosDelSistema.Dv,
+                    datosDelSistema_rutDV = mensajeOrganizacionesRES.DatosDelSistema.RutDV,
+                    datosDelSistema_nombresSolicitante = mensajeOrganizacionesRES.DatosDelSistema.NombresSolicitante,
+                    datosDelSistema_primerApellido = mensajeOrganizacionesRES.DatosDelSistema.PrimerApellido,
+                    datosDelSistema_segundoApellido = mensajeOrganizacionesRES.DatosDelSistema.SegundoApellido,
+                    datosDelSistema_emailSolicitante = mensajeOrganizacionesRES.DatosDelSistema.EmailSolicitante,
+                    datosDelSistema_fonoSolicitante = mensajeOrganizacionesRES.DatosDelSistema.FonoSolicitante,
+                    datosDelSistema_fechaCelebracion = mensajeOrganizacionesRES.DatosDelSistema.FechaCelebracion
+                };
+                var id = RESMensaje.RESCrearOrgMensajeId;
+                _dbContext.RESCrearOrgMensajes.Add(RESMensaje);
+                _dbContext.SaveChanges();
+
+
+                RESCrearOrgCooperadosYAdministradores RESCoopYAdm = new RESCrearOrgCooperadosYAdministradores();
+                List<RESCrearOrgRepresentante> RESrepresentantes = new List<RESCrearOrgRepresentante>();
+                List<RESCrearOrgCapitalDelSocio> RESCapitales = new List<RESCrearOrgCapitalDelSocio>();
+                List<RESCrearOrgCalidad> RESCalidades = new List<RESCrearOrgCalidad>();
+                foreach (CooperadoYAdministrador coopoadm in mensajeOrganizacionesRES.CooperadosYAdministradores)
+                {
+                    RESCoopYAdm = new RESCrearOrgCooperadosYAdministradores()
+                    {
+                        RESCrearOrgMensajeId = (int)RESMensaje.RESCrearOrgMensajeId,
+                        rut = coopoadm.Rut,
+                        dv = coopoadm.DV,
+                        rutDV = coopoadm.RutDV,
+                        primerApellido = coopoadm.PrimerApellido,
+                        segundoApellido = coopoadm.SegundoApellido,
+                        nombres = coopoadm.Nombres,
+                        razonSocial = coopoadm.RazonSocial,
+                        calle = coopoadm.Calle,
+                        numero = coopoadm.Numero,
+                        bloque = coopoadm.Bloque,
+                        departamento = coopoadm.Departamento,
+                        villaPoblacion = coopoadm.VillaPoblacion,
+                        region = coopoadm.Region,
+                        comuna = coopoadm.Comuna,
+                        direccion = coopoadm.Direccion,
+                        telefono = coopoadm.Telefono,
+                        eMail = coopoadm.EMail,
+                        adjuntarDocumento_url = coopoadm.AdjuntarDocumento.URL,
+                        adjuntarDocumento_nombreArchivo = coopoadm.AdjuntarDocumento.NombreArchivo
+                    };
+                    _dbContext.RESCrearOrgCooperadosYAdministradores.Add(RESCoopYAdm);
+                    _dbContext.SaveChanges();
+                    foreach (Representante representante in coopoadm.Representante)
+                    {
+                        RESrepresentantes.Add(new RESCrearOrgRepresentante()
+                        {
+                            RESCrearOrgCooperadosYAdministradoresId = RESCoopYAdm.RESCrearOrgCooperadosYAdministradoresId,
+                            rut = representante.Rut,
+                            dv = representante.Dv,
+                            rutDV = representante.RutDV,
+                            primerApellido = representante.PrimerApellido,
+                            segundoApellido = representante.SegundoApellido,
+                            nombres = representante.Nombres,
+                            adjuntarPoderRepresentacion_url = representante.AdjuntarPoderRepresentacion.URL,
+                            adjuntarPoderRepresentacion_nombreArchivo = representante.AdjuntarPoderRepresentacion.NombreArchivo
+                        });
+                    }
+                    foreach (Calidad calidad in coopoadm.Calidad)
+                    {
+                        RESCalidades.Add(new RESCrearOrgCalidad()
+                        {
+                            RESCrearOrgCooperadosYAdministradoresId = RESCoopYAdm.RESCrearOrgCooperadosYAdministradoresId,
+                            Calidad = calidad.TipoCalidades
+                        });
+                    }
+                    foreach (CapitalDelSocio capital in coopoadm.CapitalDelSocio)
+                    {
+                        RESCapitales.Add(new RESCrearOrgCapitalDelSocio()
+                        {
+                            RESCrearOrgCooperadosYAdministradoresId = RESCoopYAdm.RESCrearOrgCooperadosYAdministradoresId,
+                            tiposAporte = capital.TiposAporte,
+                            cantidadCuotas = capital.CantidadCuotas,
+                            capitalPagado = capital.CapitalPagado,
+                            capitalPorPagar = capital.CapitalPorPagar,
+                            plazoParaPagar = capital.PlazoParaPagar,
+                            formaEnQueSeraEnterado = capital.FormaEnQueSeraEnterado,
+                            descripcionAporte = capital.DescripcionAporte
+                        });
+                    }
+                }
+                foreach (RESCrearOrgRepresentante RESrepresentante in RESrepresentantes)
+                {
+                    _dbContext.RESCrearOrgRepresentantes.Add(RESrepresentante);
+                }
+                foreach (RESCrearOrgCalidad REScalidad in RESCalidades)
+                {
+                    _dbContext.RESCrearOrgCalidades.Add(REScalidad);
+                }
+                foreach (RESCrearOrgCapitalDelSocio REScapital in RESCapitales)
+                {
+                    _dbContext.RESCrearOrgCapitalDelSocios.Add(REScapital);
+                }
+
+                foreach (int actividad in mensajeOrganizacionesRES.ObjetoSocial.Actividades)
+                {
+                    _dbContext.RESCrearOrgObjetoSocial_actividades.Add(new RESCrearOrgobjetoSocial_actividades()
+                    {
+                        RESCrearOrgMensajeId = (int)RESMensaje.RESCrearOrgMensajeId,
+                        actividad = actividad
+                    });
+                }
+                _dbContext.SaveChanges();
+
+                // Guardamos el Proceso de registro organizacion en las tablas ya definidas; Proceso, Organizacion, Solicitante, Documento, Workflow
                 Rol rol = new Rol();
                 _dbContext.Roles.Add(rol);
                 _dbContext.SaveChanges();
@@ -117,7 +386,7 @@ namespace App.API.Controllers
                 {
                     TipoOrganizacionId = (int)Enum.TipoOrganizacion.Cooperativa,
                     NumeroRegistro = rol.RolId.ToString(),
-                    SituacionId = (int)Enum.Situacion.Inactiva,
+                    SituacionId = (int)Enum.Situacion.Activa,
                     RubroId = diccionarioRubros.FirstOrDefault().RubroId,
                     SubRubroId = diccionarioSubRubros.FirstOrDefault().SubRubroId,
                     RazonSocial = mensajeOrganizacionesRES.NombreCooperativa.RazonSocial,
@@ -134,41 +403,13 @@ namespace App.API.Controllers
                     NumeroSocios = mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios,
                     NumeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
                     NumeroSociosMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
-                    EstadoId = (int)Enum.Estado.RolAsignado,
+                    EstadoId = (int)Enum.Estado.Vigente,
                     NumeroSociosConstituyentes = 0,//
                     EsImportanciaEconomica = false //valores obligatorios de origanizacion, no vienen en el mensaje RES
                 };
                 _dbContext.Organizaciones.Add(organizacion);
                 _dbContext.SaveChanges();
-                /*
-                ActualizacionOrganizacion actualizacionOrganizacion = new ActualizacionOrganizacion
-                {
-                    OrganizacionId = organizacion.OrganizacionId,
-                    TipoOrganizacionId = (int)Enum.TipoOrganizacion.Cooperativa,
-                    SituacionId = (int)Enum.Situacion.Inactiva,
-                    RubroId = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
-                    SubRubroId = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
-                    RazonSocial = mensajeOrganizacionesRES.NombreCooperativa.RazonSocial,
-                    Sigla = mensajeOrganizacionesRES.NombreCooperativa.NombreFantasiaOSigla,
-                    RegionId = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region,
-                    ComunaId = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna,
-                    Direccion = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Direccion,
-                    Email = mensajeOrganizacionesRES.ContactoDeLaCooperativa.EMail,
-                    Fono = mensajeOrganizacionesRES.ContactoDeLaCooperativa.Telefono,
-                    URL = mensajeOrganizacionesRES.ContactoDeLaCooperativa.PaginaWeb,
-                    EsGeneroFemenino = (mensajeOrganizacionesRES.OtrosAcuerdos.ExclusivaMujeres == 1),
-                    FechaCelebracion = DateTime.ParseExact(mensajeOrganizacionesRES.DatosDelSistema.FechaCelebracion, "yyyy-MM-dd HH:mm:ss",
-                                       System.Globalization.CultureInfo.InvariantCulture),
-                    NumeroSocios = mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios,
-                    NumeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
-                    NumeroSociosMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
-                    EstadoId = (int)Enum.Estado.RolAsignado,
-                    NumeroSociosConstituyentes = 0,
-                    EsImportanciaEconomica = false
-                };
-                _dbContext.ActualizacionOrganizaciones.Add(actualizacionOrganizacion);
-                _dbContext.SaveChanges();
-                */
+
 
                 Solicitante solicitante = new Solicitante()
                 {
@@ -216,12 +457,8 @@ namespace App.API.Controllers
                 };
                 _dbContext.Procesos.Add(proceso);
                 _dbContext.SaveChanges();
-
-                /*
-                actualizacionOrganizacion.ProcesoId = proceso.ProcesoId;
-                _dbContext.Procesos.Update(proceso);
-                _dbContext.SaveChanges();
-                */
+                RESMensaje.ProcesoId = proceso.ProcesoId;
+                _dbContext.RESCrearOrgMensajes.Update(RESMensaje);
 
                 //aqui asignamos la persona con el perfil perfilAPI y que este sin asignacion por el momento 
                 var persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == (int)Enum.Perfil.perfilAPI && q.TareaAsignadaApi == false);
@@ -316,7 +553,7 @@ namespace App.API.Controllers
                 }
                 _dbContext.SaveChanges();
 
-                var resultData = new { Message = "La organización ha sido registrada exitosamente", ReceivedData = mensajeOrganizacionesRES };
+                var resultData = new { Message = "La organización ha sido registrada exitosamente", ProcesoId = proceso.ProcesoId, ReceivedData = mensajeOrganizacionesRES };
                 HttpContext.Items["ProcesoId"] = proceso.ProcesoId;
                 HttpContext.Items["mensajeOrganizacionesRES"] = mensajeOrganizacionesRES;
 
@@ -384,163 +621,7 @@ namespace App.API.Controllers
                             proceso.Observacion = $"fallo la subida de {numeroDocumentosFallidos} documentos de un total de {documentos.Count()}";
                         }
                         _dbContext.Procesos.Update(proceso);
-                        
                         _dbContext.SaveChanges();
-
-                        //guardamos mensaje RES en backoffice
-                        if (context.HttpContext.Items.TryGetValue("mensajeOrganizacionesRES", out var mensajeOrganizacionesRESObject) && mensajeOrganizacionesRESObject is MensajeOrganizacionRES mensajeOrganizacionesRES)
-                        {
-                            RESCrearOrgMensaje RESMensaje = new RESCrearOrgMensaje()
-                            {
-                                ProcesoId = ProcesoId,
-                                objetoSocial_rubro = mensajeOrganizacionesRES.ObjetoSocial.Rubro,
-                                objetoSocial_subRubroEspecifico = mensajeOrganizacionesRES.ObjetoSocial.SubRubroEspecifico,
-                                nombreCooperativa_razonSocial = mensajeOrganizacionesRES.NombreCooperativa.RazonSocial,
-                                nombreCooperativa_nombreFantasiaOSigla = mensajeOrganizacionesRES.NombreCooperativa.NombreFantasiaOSigla,
-                                direccionDeLaCooperativa_calle = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Calle,
-                                direccionDeLaCooperativa_numero = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Numero,
-                                direccionDeLaCooperativa_bloque = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Bloque,
-                                direccionDeLaCooperativa_departamento = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Departamento,
-                                direccionDeLaCooperativa_villaPoblacion = mensajeOrganizacionesRES.DireccionDeLaCooperativa.VillaPoblacion,
-                                direccionDeLaCooperativa_region = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Region,
-                                direccionDeLaCooperativa_comuna = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Comuna,
-                                direccionDeLaCooperativa_direccion = mensajeOrganizacionesRES.DireccionDeLaCooperativa.Direccion,
-                                contactoDeLaCooperativa_eMail = mensajeOrganizacionesRES.ContactoDeLaCooperativa.EMail,
-                                contactoDeLaCooperativa_telefono = mensajeOrganizacionesRES.ContactoDeLaCooperativa.Telefono,
-                                contactoDeLaCooperativa_paginaWeb = mensajeOrganizacionesRES.ContactoDeLaCooperativa.PaginaWeb,
-                                capitalDeLaCooperativa_montoTotalCapitalInicial = mensajeOrganizacionesRES.CapitalDeLaCooperativa.MontoTotalCapitalInicial,
-                                capitalDeLaCooperativa_numeroCuotasParticipacion = mensajeOrganizacionesRES.CapitalDeLaCooperativa.NumeroCuotasParticipacion,
-                                capitalDeLaCooperativa_valorCuotasPaticipacion = mensajeOrganizacionesRES.CapitalDeLaCooperativa.ValorCuotasPaticipacion,
-                                duracionDeLaCooperativa_indefinido = mensajeOrganizacionesRES.DuracionDeLaCooperativa.Indefinido,
-                                duracionDeLaCooperativa_anhos = mensajeOrganizacionesRES.DuracionDeLaCooperativa.Anhos,
-                                administracionDeLaCooperativa_tipoAdministracion = mensajeOrganizacionesRES.AdministracionDeLaCooperativa.TipoAdministracion,
-                                consejoAdministracion_numeroMiembros = mensajeOrganizacionesRES.ConsejoAdministracion.NumeroMiembros,
-                                consejoAdministracion_plazoDuracion = mensajeOrganizacionesRES.ConsejoAdministracion.PlazoDuracion,
-                                consejoAdministracion_derechoReeleccion = mensajeOrganizacionesRES.ConsejoAdministracion.DerechoReeleccion,
-                                juntaDeVigilancia_numeroMiembros = mensajeOrganizacionesRES.JuntaDeVigilancia.NumeroMiembros,
-                                juntaDeVigilancia_plazoDuracion = mensajeOrganizacionesRES.JuntaDeVigilancia.PlazoDuracion,
-                                juntaDeVigilancia_derechoReeleccion = mensajeOrganizacionesRES.JuntaDeVigilancia.DerechoReeleccion,
-                                derechosYObligacionesSocios_aporteParaIngresoACooperativa = mensajeOrganizacionesRES.DerechosYObligacionesSocios.AporteParaIngresoACooperativa,
-                                otrosAcuerdos_inclusiva = mensajeOrganizacionesRES.OtrosAcuerdos.Inclusiva,
-                                otrosAcuerdos_exclusivaMujeres = mensajeOrganizacionesRES.OtrosAcuerdos.ExclusivaMujeres,
-                                otrosAcuerdos_calidadIndigena = mensajeOrganizacionesRES.OtrosAcuerdos.CalidadIndigena,
-                                documentos_escrituraPublicaConstitucion_url = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.URL,
-                                documentos_escrituraPublicaConstitucion_nombreArchivo = mensajeOrganizacionesRES.Documentos.EscrituraPublicaConstitucion.NombreArchivo,
-                                documentos_inscripcionExtractoCBR_url = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.URL,
-                                documentos_inscripcionExtractoCBR_nombreArchivo = mensajeOrganizacionesRES.Documentos.InscripcionExtractoCBR.NombreArchivo,
-                                documentos_publicacionDiarioOficial_url = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.URL,
-                                documentos_publicacionDiarioOficial_nombreArchivo = mensajeOrganizacionesRES.Documentos.PublicacionDiarioOficial.NombreArchivo,
-                                datosDelSistema_numeroDeAtencion = mensajeOrganizacionesRES.DatosDelSistema.NumeroDeAtencion,
-                                datosDelSistema_numeroTotalSocios = mensajeOrganizacionesRES.DatosDelSistema.NumeroTotalSocios,
-                                datosDelSistema_numeroSociosHombres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociosHombres,
-                                datosDelSistema_numeroSociasMujeres = mensajeOrganizacionesRES.DatosDelSistema.NumeroSociasMujeres,
-                                datosDelSistema_rutSolicitante = mensajeOrganizacionesRES.DatosDelSistema.RutSolicitante,
-                                datosDelSistema_dv = mensajeOrganizacionesRES.DatosDelSistema.Dv,
-                                datosDelSistema_rutDV = mensajeOrganizacionesRES.DatosDelSistema.RutDV,
-                                datosDelSistema_nombresSolicitante = mensajeOrganizacionesRES.DatosDelSistema.NombresSolicitante,
-                                datosDelSistema_primerApellido = mensajeOrganizacionesRES.DatosDelSistema.PrimerApellido,
-                                datosDelSistema_segundoApellido = mensajeOrganizacionesRES.DatosDelSistema.SegundoApellido,
-                                datosDelSistema_emailSolicitante = mensajeOrganizacionesRES.DatosDelSistema.EmailSolicitante,
-                                datosDelSistema_fonoSolicitante = mensajeOrganizacionesRES.DatosDelSistema.FonoSolicitante,
-                                datosDelSistema_fechaCelebracion = mensajeOrganizacionesRES.DatosDelSistema.FechaCelebracion
-                            };
-                            _dbContext.RESCrearOrgMensajes.Add(RESMensaje);
-                            _dbContext.SaveChanges();
-
-
-                            RESCrearOrgCooperadosYAdministradores RESCoopYAdm = new RESCrearOrgCooperadosYAdministradores();
-                            List<RESCrearOrgRepresentante> RESrepresentantes = new List<RESCrearOrgRepresentante>();
-                            List<RESCrearOrgCapitalDelSocio> RESCapitales = new List<RESCrearOrgCapitalDelSocio>();
-                            List<RESCrearOrgCalidad> RESCalidades = new List<RESCrearOrgCalidad>();
-                            foreach (CooperadoYAdministrador coopoadm in mensajeOrganizacionesRES.CooperadosYAdministradores)
-                            {
-                                RESCoopYAdm = new RESCrearOrgCooperadosYAdministradores()
-                                {
-                                    RESCrearOrgMensajeId = RESMensaje.RESCrearOrgMensajeId,
-                                    rut = coopoadm.Rut,
-                                    dv = coopoadm.DV,
-                                    rutDV = coopoadm.RutDV,
-                                    primerApellido = coopoadm.PrimerApellido,
-                                    segundoApellido = coopoadm.SegundoApellido,
-                                    nombres = coopoadm.Nombres,
-                                    razonSocial = coopoadm.RazonSocial,
-                                    calle = coopoadm.Calle,
-                                    numero = coopoadm.Numero,
-                                    bloque = coopoadm.Bloque,
-                                    departamento = coopoadm.Departamento,
-                                    villaPoblacion = coopoadm.VillaPoblacion,
-                                    region = coopoadm.Region,
-                                    comuna = coopoadm.Comuna,
-                                    direccion = coopoadm.Direccion,
-                                    telefono = coopoadm.Telefono,
-                                    eMail = coopoadm.EMail,
-                                    adjuntarDocumento_url = coopoadm.AdjuntarDocumento.URL,
-                                    adjuntarDocumento_nombreArchivo = coopoadm.AdjuntarDocumento.NombreArchivo
-                                };
-                                _dbContext.RESCrearOrgCooperadosYAdministradores.Add(RESCoopYAdm);
-                                _dbContext.SaveChanges();
-                                foreach (Representante representante in coopoadm.Representante)
-                                {
-                                    RESrepresentantes.Add(new RESCrearOrgRepresentante()
-                                    {
-                                        RESCrearOrgCooperadosYAdministradoresId = RESCoopYAdm.RESCrearOrgCooperadosYAdministradoresId,
-                                        rut = representante.Rut,
-                                        dv = representante.Dv,
-                                        rutDV = representante.RutDV,
-                                        primerApellido = representante.PrimerApellido,
-                                        segundoApellido = representante.SegundoApellido,
-                                        nombres = representante.Nombres,
-                                        adjuntarPoderRepresentacion_url = representante.AdjuntarPoderRepresentacion.URL,
-                                        adjuntarPoderRepresentacion_nombreArchivo = representante.AdjuntarPoderRepresentacion.NombreArchivo
-                                    });
-                                }
-                                foreach (Calidad calidad in coopoadm.Calidad)
-                                {
-                                    RESCalidades.Add(new RESCrearOrgCalidad()
-                                    {
-                                        RESCrearOrgCooperadosYAdministradoresId = RESCoopYAdm.RESCrearOrgCooperadosYAdministradoresId,
-                                        Calidad = calidad.TipoCalidades
-                                    });
-                                }
-                                foreach (CapitalDelSocio capital in coopoadm.CapitalDelSocio)
-                                {
-                                    RESCapitales.Add(new RESCrearOrgCapitalDelSocio()
-                                    {
-                                        RESCrearOrgCooperadosYAdministradoresId = RESCoopYAdm.RESCrearOrgCooperadosYAdministradoresId,
-                                        tiposAporte = capital.TiposAporte,
-                                        cantidadCuotas = capital.CantidadCuotas,
-                                        capitalPagado = capital.CapitalPagado,
-                                        capitalPorPagar = capital.CapitalPorPagar,
-                                        plazoParaPagar = capital.PlazoParaPagar,
-                                        formaEnQueSeraEnterado = capital.FormaEnQueSeraEnterado,
-                                        descripcionAporte = capital.DescripcionAporte
-                                    });
-                                }
-                            }
-                            foreach (RESCrearOrgRepresentante RESrepresentante in RESrepresentantes)
-                            {
-                                _dbContext.RESCrearOrgRepresentantes.Add(RESrepresentante);
-                            }
-                            foreach (RESCrearOrgCalidad REScalidad in RESCalidades)
-                            {
-                                _dbContext.RESCrearOrgCalidades.Add(REScalidad);
-                            }
-                            foreach (RESCrearOrgCapitalDelSocio REScapital in RESCapitales)
-                            {
-                                _dbContext.RESCrearOrgCapitalDelSocios.Add(REScapital);
-                            }
-
-                            foreach (int actividad in mensajeOrganizacionesRES.ObjetoSocial.Actividades)
-                            {
-                                _dbContext.RESCrearOrgObjetoSocial_actividades.Add(new RESCrearOrgobjetoSocial_actividades()
-                                {
-                                    RESCrearOrgMensajeId = RESMensaje.RESCrearOrgMensajeId,
-                                    actividad = actividad
-                                });
-                            }
-
-                            _dbContext.SaveChanges();
-                        }
                     }
                 }
 

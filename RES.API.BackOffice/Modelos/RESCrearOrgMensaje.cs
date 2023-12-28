@@ -15,10 +15,10 @@ namespace DAES.API.BackOffice.Modelos
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
         [Display(Name = "Id")]
-        public int RESCrearOrgMensajeId { get; set; }
+        public int? RESCrearOrgMensajeId { get; set; }
 
         [Display(Name = "Proceso Id")]
-        public int ProcesoId { get; set; }
+        public int? ProcesoId { get; set; }
 
         [Display(Name = "Rubro Coooperativa")]
         public int objetoSocial_rubro { get; set; }
