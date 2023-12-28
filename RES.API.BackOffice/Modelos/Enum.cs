@@ -14,7 +14,7 @@
             Transparencia = 8,
             SIAC = 9,
             RepresentanteOrganizacion = 10,
-            perfilAPI = 11
+            ConstitucionWeb = 12
         }
 
         public enum TipoNorma

@@ -461,17 +461,17 @@ namespace App.API.Controllers
                 _dbContext.RESCrearOrgMensajes.Update(RESMensaje);
 
                 //aqui asignamos la persona con el perfil perfilAPI y que este sin asignacion por el momento 
-                var persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == (int)Enum.Perfil.perfilAPI && q.TareaAsignadaApi == false);
+                var persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == (int)Enum.Perfil.ConstitucionWeb && q.TareaAsignadaApi == false);
                 if (persona == null)
                 {
-                    var personas = _dbContext.NetUsers.Where(q => q.PerfilId == (int)Enum.Perfil.perfilAPI && q.TareaAsignadaApi == true);
+                    var personas = _dbContext.NetUsers.Where(q => q.PerfilId == (int)Enum.Perfil.ConstitucionWeb && q.TareaAsignadaApi == true);
                     foreach (var p in personas)
                     {
                         p.TareaAsignadaApi = false;
 
                     }
                     _dbContext.SaveChanges();
-                    persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == (int)Enum.Perfil.perfilAPI && q.TareaAsignadaApi == false);
+                    persona = _dbContext.NetUsers.FirstOrDefault(q => q.PerfilId == (int)Enum.Perfil.ConstitucionWeb && q.TareaAsignadaApi == false);
                 }
                 persona.TareaAsignadaApi = true;
 
