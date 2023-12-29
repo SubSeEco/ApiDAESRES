@@ -239,11 +239,11 @@
             //ActualizacionConsejoAdmninistracion = 118,
             //AsambleaOrdinaria = 117,
 
-            InscripcionConstitucionRES = 1127,
+            InscripcionConstitucionCooperativaDigital = 127,
         }
-        public enum DefinicionWorkflow
+        public enum TipoWorkflow
         {
-            InscripcionConstitucionRES = 1231,
+            VerificarDatosActualizacion = 53,
         }
 
         public enum Aprobacion

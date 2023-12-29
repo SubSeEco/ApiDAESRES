@@ -226,6 +226,16 @@ namespace App.API.Controllers
                     return BadRequest(new { Message = "errores: "+string.Join(", ", errors) });
                 }
 
+                //recuperamos el definicionWorkflowId que usaremos para ContitucionWeb de cooperativa digital RES
+                IQueryable<DefinicionWorkflow> definicionWorkflow = _dbContext.DefinicionWorkflows.Where(s => s.Habilitado && s.DefinicionProcesoId == (int)Enum.DefinicionProceso.InscripcionConstitucionCooperativaDigital
+                    && s.TipoWorkflowId == (int)Enum.TipoWorkflow.VerificarDatosActualizacion).OrderBy(s => s.Secuencia).ThenBy(s => s.DefinicionWorkflowId);
+
+                /*
+                if (!definicionWorkflow.Any())
+                {
+                }
+                */
+
                 //guardamos mensaje RES en backoffice
                 RESCrearOrgMensaje RESMensaje = new RESCrearOrgMensaje()
                 {
@@ -441,14 +451,14 @@ namespace App.API.Controllers
 
 
                 var now = DateTime.Now;
-                DateTime FechaTermino = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == (int)Enum.DefinicionProceso.InscripcionConstitucionRES).Duracion);
+                DateTime FechaTermino = now.AddDays(_dbContext.DefinicionProcesos.FirstOrDefault(q => q.DefinicionProcesoId == (int)Enum.DefinicionProceso.InscripcionConstitucionCooperativaDigital).Duracion);
 
 
                 Proceso proceso = new Proceso()
                 {
                     OrganizacionId = organizacion.OrganizacionId,//
                     SolicitanteId = solicitante.SolicitanteId,
-                    DefinicionProcesoId = (int)Enum.DefinicionProceso.InscripcionConstitucionRES,
+                    DefinicionProcesoId = (int)Enum.DefinicionProceso.InscripcionConstitucionCooperativaDigital,
                     FechaCreacion = now,
                     FechaVencimiento = FechaTermino,
                     Terminada = false,
@@ -475,19 +485,26 @@ namespace App.API.Controllers
                 }
                 persona.TareaAsignadaApi = true;
 
+                Workflow? primerWorkflow = null ;
 
-                Workflow workflow = new Workflow()
+                foreach (DefinicionWorkflow workflow in definicionWorkflow)
                 {
-                    ProcesoId = proceso.ProcesoId,
-                    FechaCreacion = now,
-                    FechaTermino = FechaTermino,
-                    DefinicionWorkflowId = (int)Enum.DefinicionWorkflow.InscripcionConstitucionRES,
-                    UserId = persona.Id,
-                    TipoAprobacionId = (int)Enum.TipoAprobacion.SinAprobacion
-                };
-                _dbContext.Add(workflow);
+                    Workflow newWorkflow = new Workflow()
+                    {
+                        ProcesoId = proceso.ProcesoId,
+                        FechaCreacion = now,
+                        FechaTermino = FechaTermino,
+                        DefinicionWorkflowId = workflow.DefinicionWorkflowId,
+                        UserId = persona.Id,
+                        TipoAprobacionId = (int)Enum.TipoAprobacion.SinAprobacion
+                    };
+                    _dbContext.Add(newWorkflow);
+                    if (primerWorkflow is null) { primerWorkflow = newWorkflow; }
+                }
                 _dbContext.SaveChanges();
 
+                int? primerWorkflowId = null;
+                if (primerWorkflow is not null) { primerWorkflowId = primerWorkflow.WorkflowId; }
 
                 List<Documento> documentos = new List<Documento>();
                 documentos.Add(new Documento()
@@ -497,7 +514,7 @@ namespace App.API.Controllers
                     Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
-                    WorkflowId = workflow.WorkflowId,
+                    WorkflowId = primerWorkflowId,
                     FechaCreacion = now,
                     //FechaValidoHasta = FechaTermino,
                     Descripcion = "Publicacion del diario oficial",
@@ -511,7 +528,7 @@ namespace App.API.Controllers
                     Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
-                    WorkflowId = workflow.WorkflowId,
+                    WorkflowId = primerWorkflowId,
                     FechaCreacion = now,
                     //FechaValidoHasta = FechaTermino,
                     Descripcion = "Inscripcion extracto CBR",
@@ -525,7 +542,7 @@ namespace App.API.Controllers
                     Activo = false,
                     OrganizacionId = organizacion.OrganizacionId,//
                     ProcesoId = proceso.ProcesoId,
-                    WorkflowId = workflow.WorkflowId,
+                    WorkflowId = primerWorkflowId,
                     FechaCreacion = now,
                     //FechaValidoHasta = FechaTermino,
                     Descripcion = "Escritura publica de constitución",
@@ -541,7 +558,7 @@ namespace App.API.Controllers
                         Activo = false,
                         OrganizacionId = organizacion.OrganizacionId,//
                         ProcesoId = proceso.ProcesoId,
-                        WorkflowId = workflow.WorkflowId,
+                        WorkflowId = primerWorkflowId,
                         FechaCreacion = now,
                         //FechaValidoHasta = FechaTermino, 
                         Enviado = false
