@@ -19,7 +19,6 @@ namespace DAES.API.BackOffice.Modelos
         [Required(ErrorMessage = "Es necesario especificar este dato")]
         [Display(Name = "Definición proceso")]
         public int DefinicionProcesoId { get; set; }
-        public virtual DefinicionProceso DefinicionProceso { get; set; }
 
         [Display(Name = "Perfil")]
         public int? PerfilId { get; set; }
